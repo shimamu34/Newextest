@@ -105,7 +105,6 @@ function RT() {
     const g = document.getElementById("gender").value;
     if (!D[g]) return;
     const h = D[g].h;
-    
     const formatTime = (sec) => {
         const m = Math.floor(sec / 60);
         const s = Math.round(sec % 60);
@@ -115,45 +114,66 @@ function RT() {
     let s = '<table><tr><th></th>';
     h.forEach(x => s += `<th>${x}</th>`);
     s += '</tr>';
-    ["記録", "帯広市", "北海道", "全国"].forEach(r => {
+
+    // ★重要：ここに行の並び順を定義します
+    const rowNames = ["記録", "目標", "目標得点", "帯広市", "北海道", "全国"];
+
+    rowNames.forEach(r => {
         let label = r;
+        let trStyle = "";
+        if (r === "目標") trStyle = 'style="background:#e6fffa;"';
+        if (r === "目標得点") trStyle = 'style="background:#f0fff4; font-size:0.8em; color:#2f855a;"';
+        
         if (r === "北海道" || r === "全国") {
-            label = `<div>${r}</div><div style="font-size:0.8em; color:#666; font-weight:normal;">(R7)</div>`;
+            label = `<div>${r}</div><div style="font-size:0.8em; color:#666;">(R7)</div>`;
         }
-        s += '<tr><td>' + label + '</td>';
+
+        s += `<tr ${trStyle}><td>${label}</td>`;
+
         h.forEach((x, j) => {
             if (r === "記録") {
+                // --- 自分の記録（既存のコード） ---
                 if (j === 4) { 
-                    s += `<td style="padding:2px; min-width:100px;">
-        <div style="display:flex;align-items:center;justify-content:center;gap:2px;">
-            <input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;text-align:center;padding:2px;">
-            :
-            <input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;text-align:center;padding:2px;">
-        </div>
-        <input type="hidden" id="i4">
-      </td>`;
+                    s += `<td><div style="display:flex;justify-content:center;gap:2px;">
+                          <input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:
+                          <input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;">
+                          </div><input type="hidden" id="i4"></td>`;
                 } else if (j < 9) {
-                    s += `<td><input type="number" id="i${j}" class="v-in" onchange="U()" step="0.1" style="width:100%;box-sizing:border-box;"></td>`;
+                    s += `<td><input type="number" id="i${j}" class="v-in" onchange="U()" step="0.1" style="width:100%;"></td>`;
                 } else {
                     s += `<td id="i9"><div>0</div><div>E</div></td>`;
                 }
+            } else if (r === "目標") {
+                // --- ★目標入力欄 ---
+                if (j < 9) {
+                    s += `<td><input type="number" id="t-i${j}" class="t-in" oninput="UT()" step="0.1" style="width:100%; border:1px solid #38b2ac; border-radius:4px;"></td>`;
+                } else {
+                    s += `<td>-</td>`; // 合計列は入力不要
+                }
+            } else if (r === "目標得点") {
+                // --- ★目標に対する得点表示 ---
+                if (j < 9) {
+                    s += `<td id="ts-i${j}">-</td>`;
+                } else {
+                    s += `<td>-</td>`;
+                }
             } else {
+                // --- 統計データ（既存のコード） ---
                 let v = A[g][r][j];
                 let displayVal = (j === 4) ? formatTime(v) : v;
-                if (j === 9) { 
-                    let totalScore = T[g][r];   // data.js の T から数値を読み込む
-                    let totalRank = TR[g][r];    // data.js の TR からランクを読み込む
-                    s += `<td><div>${totalScore}</div><div style="font-size:0.8em;color:#666">(${totalRank})</div></td>`; 
-                } else { 
+                if (j === 9) {
+                    let totalScore = T[g][r];
+                    let totalRank = TR[g][r];
+                    s += `<td><div>${totalScore}</div><div style="font-size:0.8em;color:#666">(${totalRank})</div></td>`;
+                } else {
                     const sc = CS(v, x, g);
-                    s += `<td><div>${displayVal}</div><div style="font-size:0.8em;color:#666">(${sc}点)</div></td>`; 
+                    s += `<td><div>${displayVal}</div><div style="font-size:0.8em;color:#666">(${sc}点)</div></td>`;
                 }
             }
         });
         s += '</tr>';
     });
     s += '</table>';
-    document.getElementById("table").style.position = "relative";
     document.getElementById("table").innerHTML = '<div id="table-timestamp"></div>' + s;
 }
 
@@ -259,6 +279,55 @@ function U(isInitial = false) {
     if (typeof renderRanking === 'function') {
         const ra = document.getElementById("ranking");
         if (ra && ra.style.display !== "none") renderRanking();
+    }
+}
+
+function UT() {
+    const g = document.getElementById("gender").value;
+    const gr = parseInt(document.getElementById("grade").value);
+    const h = D[g].h;
+    let tScores = [];
+
+    // 1. 各項目の得点を計算
+    for (let i = 0; i < 9; i++) {
+        const val = parseFloat(document.getElementById(`t-i${i}`).value);
+        const display = document.getElementById(`ts-i${i}`);
+        
+        if (!isNaN(val) && val > 0) {
+            const sc = CS(val, h[i], g);
+            tScores.push(sc);
+            display.textContent = sc + "点";
+        } else {
+            tScores.push(0);
+            display.textContent = "-";
+        }
+    }
+
+    // 2. 目標合計点の計算（持久走とシャトルランの大きい方を採用）
+    const tTotal = tScores[0] + tScores[1] + tScores[2] + tScores[3] + 
+                   Math.max(tScores[4], tScores[5]) + 
+                   tScores[6] + tScores[7] + tScores[8];
+
+    // 3. ランク判定
+    let tRank = "E";
+    for (let i = 0; i < E.length; i++) {
+        const criteria = E[i][`c${gr}`];
+        let min, max;
+        if (criteria.includes("以上")) { min = parseFloat(criteria); max = 100; }
+        else if (criteria.includes("以下")) { min = 0; max = parseFloat(criteria); }
+        else { [min, max] = criteria.split("～").map(Number); }
+        
+        if (tTotal >= min && tTotal <= max) { tRank = E[i].s; break; }
+    }
+
+    // 4. 結果を表示
+    const summary = document.getElementById("target-summary");
+    if (tTotal > 0) {
+        summary.style.display = "block";
+        document.getElementById("t-total").textContent = tTotal;
+        document.getElementById("t-rank").textContent = tRank;
+    } else {
+        summary.style.display = "none";
     }
 }
 

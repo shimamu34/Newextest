@@ -216,15 +216,15 @@
                 <button onclick="closeSetupGuide()" style="background:none;border:none;font-size:30px;cursor:pointer;color:#666">✕</button>
             </div>
             <div id="setupContent" style="padding: 10px;">
-                <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 30px; font-size: 26px; border-bottom: 3px solid #2b6cb0; padding-bottom: 10px;">🏫 初回セットアップ手順 (決定版)</h2>
+    <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 30px; font-size: 26px; border-bottom: 3px solid #2b6cb0; padding-bottom: 10px;">⚙️ 初回セットアップ手順</h2>
 
-                <div style="display: flex; justify-content: center; gap: 30px; align-items: start; max-width: 1000px; margin: 0 auto;">
-                    <div>
-                        <div style="background: #f0f7ff; padding: 20px; border-radius: 12px; border-left: 8px solid #2b6cb0; margin-bottom: 25px;">
-                            <p style="margin:0 0 12px 0; font-size:18px;"><strong>1. 専用プログラムをコピーする</strong></p>
-                            <button onclick="copyGsCode()" style="width:100%; padding:15px; background:#2b6cb0; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;">📋 プログラムをコピー</button>
+    <div style="display: flex; justify-content: center; gap: 30px; align-items: start; max-width: 1000px; margin: 0 auto;">
+        <div style="flex: 1;">
+            <div style="background: #f0f7ff; padding: 20px; border-radius: 12px; border-left: 8px solid #2b6cb0; margin-bottom: 25px;">
+                <p style="margin:0 0 12px 0; font-size:18px;"><strong>1. 専用プログラムをコピーする</strong></p>
+                <button onclick="copyGsCode()" style="width:100%; padding:15px; background:#2b6cb0; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;">📋 プログラムをコピー</button>
 
-                            <textarea id="gsCodeSource" style="display:none;">
+                <textarea id="gsCodeSource" style="display:none;">
 function doGet(e) {
   try {
     var data = e.parameter;
@@ -279,32 +279,52 @@ function doGet(e) {
 }
                             </textarea>
                         </div>
-                        <div style="background: #fdfaea; padding: 15px 20px 2px 20px; border-left: 8px solid #f6ad55; margin-bottom: 20px; border-radius: 12px;">
-                            <p style="margin:0 0 10px 0; font-size:18px;"><strong>2. スプレッドシートの設定</strong></p>
-                            <ol style="font-size: 15px; margin:0; padding-left:22px; line-height:1.4;">
-                                <li>「拡張機能」➔「Apps Script」を開き、1でコピーしたコードを<b>全て上書き</b>。</li>
-                                <li>右上の<b>「デプロイ」➔「新しいデプロイ」</b>。</li>
-                                <li>種類：<b>ウェブアプリ</b>、アクセス：<b>全員</b>にしてデプロイ。</li>
-                            </ol>
-                        </div>
-                    </div>
+                        
+                        <div style="background: #fdfaea; padding: 15px 20px 2px 20px; border-left: 8px solid #f6ad55; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 12px;">
+                <p style="margin:0 0 10px 0; font-size:18px;"><strong>2. スプレッドシートの設定</strong></p>
+                <ol style="font-size: 15px; margin:0; padding-left:22px; line-height:1.4; color:#333;">
+                    <li style="margin-bottom: 4px;"><a href="https://sheets.new/" target="_blank" style="color:#2b6cb0; font-weight:bold; text-decoration: underline;">新規スプレッドシート</a>を作成します。</li>
+                    <li style="margin-bottom: 4px;">上のメニューから<b>「拡張機能」➔「Apps Script」</b>を開く。</li>
+                    <li style="margin-bottom: 4px;">元からあるコードを全て消して、1でコピーしたコードを<b>貼り付け</b>。</li>
+                    <li style="margin-bottom: 4px;">右上の青い<b>「デプロイ」➔「新しいデプロイ」</b>をクリック。</li>
+                    <li style="margin-bottom: 4px;">種類（歯車）から<b>「ウェブアプリ」</b>を選択。</li>
+                    <li style="margin-bottom: 0;">設定を以下にしてデプロイを押してください。
+                        <ul style="margin: 2px 0 0 0; padding-left: 20px; color: #c53030; list-style-type: '● ';">
+                            <li style="margin-bottom: 2px;">次のユーザーとして実行：<b>自分</b></li>
+                            <li style="margin-bottom: 0;">アクセスできるユーザー：<b>全員</b></li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
 
-                    <div style="position: sticky; top: 0;">
-                        <div style="background: #fff5f0; padding: 25px; border-radius: 12px; border: 3px solid #FF5722;">
-                            <p style="margin:0 0 15px 0; font-size:18px;"><strong>3. URLの登録と保存</strong></p>
-                            <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." style="width:100%; padding:15px; margin-bottom:15px; border: 2px solid #ccc; border-radius: 8px;">
-                            <button onclick="saveGasUrl()" style="width:100%; padding:15px; background:#FF5722; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">💾 設定を保存して配布URLを作成</button>
-                            <div id="studentUrlArea" style="display:none; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #FF5722;">
-                                <p style="font-weight:bold;">✅ 生徒に配布するURL：</p>
-                                <input type="text" id="studentDistUrlInput" readonly style="width:100%; padding:12px; font-size:12px; background: #f8f8f8; border: 1px solid #ccc; margin-bottom: 15px;">
-                                <button onclick="copyStudentUrl()" style="width:100%; padding:15px; background:#4CAF50; color:white; border:none; border-radius:8px; font-weight:bold;">📋 配布URLをコピー</button>
-                            </div>
-                        </div>
-                    </div>
+            <div style="padding: 18px; background: #fff; border: 2px dashed #f6ad55; border-radius: 12px; font-size: 14px; color: #444; line-height: 1.6; margin-bottom: 20px;">
+                <p style="font-weight: bold; margin:0 0 8px 0; color:#d69e2e; font-size: 16px;">⚠️ 「承認」画面が出た場合の対処：</p>
+                1. 自分のアカウントを選択。<br>
+                2. 警告画面で左下の<b>「詳細を表示(Advanced)」</b>をクリック。<br>
+                3. 一番下の<b>「Go to 無題のプロジェクト(unsafe).」</b>をクリック。<br>
+                4. 次のページの「許可 or Continue」を押せば完了です。
+            </div>
+        </div>
+
+        <div style="width: 380px; position: sticky; top: 0;">
+            <div style="background: #fff5f0; padding: 25px; border-radius: 12px; border: 3px solid #FF5722; box-shadow: 0 6px 12px rgba(0,0,0,0.1);">
+                <p style="margin:0 0 15px 0; font-size:18px;"><strong>3. URLの登録と保存</strong></p>
+                <p style="font-size: 14px; margin-bottom: 15px; line-height: 1.6;">最後に、スプレッドシートで発行された<b>「ウェブアプリURL」</b>をここに貼り付けて保存してください。</p>
+
+                <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." style="width:100%; padding:15px; margin-bottom:15px; border: 2px solid #ccc; border-radius: 8px; box-sizing:border-box; font-size:14px;">
+
+                <button onclick="saveGasUrl()" style="width:100%; padding:15px; background:#FF5722; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">💾 設定を保存して配布URLを作成</button>
+
+                <div id="studentUrlArea" style="display:none; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #FF5722;">
+                    <p style="font-size: 15px; font-weight:bold; color:#2d3748; margin-bottom:10px;">✅ 準備完了！生徒に配布するURL：</p>
+                    <input type="text" id="studentDistUrlInput" readonly style="width:100%; padding:12px; font-size:12px; background: #f8f8f8; border: 1px solid #ccc; margin-bottom: 15px; box-sizing:border-box; color: #555;">
+                    <button onclick="copyStudentUrl()" style="width:100%; padding:15px; background:#4CAF50; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">📋 配布URLをコピー</button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px; text-align: center;">このURLを生徒の端末で開かせてください。</p>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>

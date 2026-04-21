@@ -367,7 +367,9 @@ function sendToTeacher() {
     // 1. 本人登録情報の取得
     const name = localStorage.getItem('studentName');
     const studentId = localStorage.getItem('studentId');
-    const gasUrl = localStorage.getItem('gasUrl') || localStorage.getItem('teacherScriptUrl');
+    
+    // 【重要】手動設定(teacherScriptUrl)を最優先にし、なければ自動設定(gasUrl)を見るように修正
+    const gasUrl = localStorage.getItem('teacherScriptUrl') || localStorage.getItem('gasUrl');
 
     if (!name || !studentId) {
         alert("先に「本人登録」を完了させてください。");
@@ -375,7 +377,7 @@ function sendToTeacher() {
         return;
     }
     if (!gasUrl) {
-        alert("送信先URLが設定されていません。初回設定から保存してください。");
+        alert("送信先URLが設定されていません。管理者（先生）に確認してください。");
         return;
     }
 
@@ -390,10 +392,18 @@ function sendToTeacher() {
         enduranceVal = `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    // 3. 送信データの作成（合計点・評価を正しく取得）
+    // 3. 送信データの取得（エラー防止策を強化）
     const scArea = document.getElementById("i9");
-    const totalVal = scArea ? scArea.querySelectorAll("div")[0].innerText : "0";
-    const rankVal = scArea ? scArea.querySelectorAll("div")[1].innerText : "E";
+    let totalVal = "0";
+    let rankVal = "E";
+    
+    if (scArea) {
+        const divs = scArea.querySelectorAll("div");
+        if (divs.length >= 2) {
+            totalVal = divs[0].innerText;
+            rankVal = divs[1].innerText;
+        }
+    }
 
     const payload = {
         name: name,
@@ -402,33 +412,34 @@ function sendToTeacher() {
         grade: document.getElementById('grade').value,
         class: document.getElementById('class').value,
         session: document.getElementById('session').value,
-        grip: document.getElementById('i0').value || "",
-        situp: document.getElementById('i1').value || "",
-        forward: document.getElementById('i2').value || "",
-        sidestep: document.getElementById('i3').value || "",
+        grip: document.getElementById('i0').value || "0",
+        situp: document.getElementById('i1').value || "0",
+        forward: document.getElementById('i2').value || "0",
+        sidestep: document.getElementById('i3').value || "0",
         endurance: enduranceVal,
-        shuttle: document.getElementById('i5').value || "",
-        sprint50: document.getElementById('i6').value || "",
-        jump: document.getElementById('i7').value || "",
-        throw: document.getElementById('i8').value || "",
-        total: totalVal, // 修正：i9から取得した合計点
-        rank: rankVal    // 修正：i9から取得した評価
+        shuttle: document.getElementById('i5').value || "0",
+        sprint50: document.getElementById('i6').value || "0",
+        jump: document.getElementById('i7').value || "0",
+        throw: document.getElementById('i8').value || "0",
+        total: totalVal,
+        rank: rankVal
     };
+
     const params = new URLSearchParams(payload);
 
-    // 4. GET通信で送信
+    // 4. 通信実行
     fetch(`${gasUrl}?${params.toString()}`, {
         method: 'GET',
-        mode: 'no-cors'
+        mode: 'no-cors' // GAS送信に必須の設定
     })
     .then(() => {
         if (typeof N === 'function') N('送信完了しました！', 'success');
-        alert(`${name}さんのデータを送信しました。\n合計点：${payload.total} 点（評価：${payload.rank}）`);
+        alert(`${name}さんのデータを送信しました。\n合計点：${payload.total} 点（評価：${payload.rank}）\n※反映されない場合は、先生側のGAS設定を確認してください。`);
     })
     .catch(err => {
         console.error("Fetch error:", err);
         if (typeof N === 'function') N('送信失敗', 'error');
-        alert('送信に失敗しました。ネット接続や設定URLを確認してください。');
+        alert('送信に失敗しました。ネット接続を確認してください。');
     });
 }
 

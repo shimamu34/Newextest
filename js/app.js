@@ -289,6 +289,7 @@ function UT() {
     const h = D[g].h;
     let tScores = [];
 
+    // 1. 個別種目の得点計算
     for (let i = 0; i < 9; i++) {
         const val = parseFloat(document.getElementById(`t-i${i}`).value);
         const scoreDisplay = document.getElementById(`ts-i${i}`);
@@ -303,12 +304,12 @@ function UT() {
         }
     }
 
-    // 目標の合計点（持久走/シャトルランの大きい方を採用）
+    // 2. 目標合計点（持久走/シャトルランの大きい方を採用）
     const tTotal = tScores[0] + tScores[1] + tScores[2] + tScores[3] + 
                    Math.max(tScores[4], tScores[5]) + 
                    tScores[6] + tScores[7] + tScores[8];
 
-    // 目標のランク判定
+    // 3. 目標ランク判定
     let tRank = "E";
     for (let i = 0; i < E.length; i++) {
         const criteria = E[i][`c${gr}`];
@@ -319,15 +320,14 @@ function UT() {
         if (tTotal >= min && tTotal <= max) { tRank = E[i].s; break; }
     }
 
-    // 右端の合計・ランク表示を更新
-    const totalArea = document.getElementById("t-i9");
-    if (totalArea) {
-        totalArea.querySelectorAll("div")[0].textContent = tTotal;
-        totalArea.querySelectorAll("div")[1].textContent = tRank;
-    }
+    // 4. 表示の更新（位置を分離）
+    const totalCell = document.getElementById("t-total-cell");
+    const rankCell = document.getElementById("t-rank-cell");
+    
+    if (totalCell) totalCell.textContent = tTotal;
+    if (rankCell) rankCell.textContent = tRank;
 
-    // 目標を保存
-    SIT();
+    SIT(); // 保存
 }
 
 // 目標をlocalStorageに保存

@@ -434,7 +434,7 @@ function sendToTeacher() {
     })
     .then(() => {
         if (typeof N === 'function') N('送信完了しました！', 'success');
-        alert(`${name}さんのデータを送信しました。\n合計点：${payload.total} 点（評価：${payload.rank}）\n※反映されない場合は、先生側のGAS設定を確認してください。`);
+        alert(`${name}さんのデータを送信しました。\n合計点：${payload.total} 点（評価：${payload.rank}）`);
     })
     .catch(err => {
         console.error("Fetch error:", err);

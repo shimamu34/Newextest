@@ -390,7 +390,11 @@ function sendToTeacher() {
         enduranceVal = `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    // 3. 送信データの作成（合計点・評価を追加）
+    // 3. 送信データの作成（合計点・評価を正しく取得）
+    const scArea = document.getElementById("i9");
+    const totalVal = scArea ? scArea.querySelectorAll("div")[0].innerText : "0";
+    const rankVal = scArea ? scArea.querySelectorAll("div")[1].innerText : "E";
+
     const payload = {
         name: name,
         studentId: studentId,
@@ -407,10 +411,9 @@ function sendToTeacher() {
         sprint50: document.getElementById('i6').value || "",
         jump: document.getElementById('i7').value || "",
         throw: document.getElementById('i8').value || "",
-        total: document.getElementById('total').innerText, // 合計点
-        rank: document.getElementById('rank').innerText    // 評価(A～E)
+        total: totalVal, // 修正：i9から取得した合計点
+        rank: rankVal    // 修正：i9から取得した評価
     };
-
     const params = new URLSearchParams(payload);
 
     // 4. GET通信で送信

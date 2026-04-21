@@ -227,48 +227,43 @@
                             <textarea id="gsCodeSource" style="display:none;">
 function doGet(e) {
   try {
-    var data = e.parameter; // GET通信のデータを受け取る
+    var data = e.parameter;
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    
-    // データの取得（学年・組・回数）
-    var grade = String(data.grade || "?").trim();
-    var className = String(data.class || "?").trim();
-    var session = String(data.session || "?").trim();
-    
-    // シート名の作成と取得（なければ作成）
-    var sheetName = grade + "年-" + className + "組-" + session + "回目";
+    var g = data.grade || "?";
+    var c = data.class || "?";
+    var s = data.session || "?";
+    var sheetName = g + "年-" + c + "組-" + s + "回目";
     var sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName);
 
-    // 見出しの作成（合計点・評価を「投」の右に追加）
+    // 見出しに「合計点」と「評価」を追加
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(['出席番号', '氏名', '性別', '学年', '組', '回', '握力', '上体', '長座', '反復', '持久', 'シャトル', '50m', '立ち幅', '投', '合計点', '評価', '日時']);
     }
 
-    // 出席番号を半角数字に整形
     var sId = data.studentId ? String(data.studentId).replace(/[０-９]/g, function(s) {
       return String.fromCharCode(s.charCodeAt(0) - 65248);
     }).trim() : "0";
 
-    // 上書き判定（出席番号と学年が一致する行を探す）
     var rows = sheet.getDataRange().getValues();
     var rowIndex = -1;
     for (var i = 1; i < rows.length; i++) {
-      if (String(rows[i][0]) === sId && String(rows[i][3]) === grade) {
+      if (String(rows[i][0]) === sId && String(rows[i][3]) === String(g)) {
         rowIndex = i + 1;
         break;
       }
     }
 
-    // 保存用データ（順番に注意）
+    // 保存データに合計点(data.total)と評価(data.rank)を挿入
     var rowData = [
       sId, data.name || "", 
       (data.gender === '男' || data.gender === '男子') ? '男子' : '女子',
-      grade, className, session,
+      g, c, s, 
       data.grip || "", data.situp || "", data.forward || "", data.sidestep || "",
-      data.endurance || "", data.shuttle || "", data.sprint50 || "", data.jump || "", data.throw || "",
-      data.total || "", // 合計点（K列の右）
-      data.rank || "",  // 評価（合計点の右）
-      new Date()        // 送信日時（一番右）
+      data.endurance || "", data.shuttle || "", data.sprint50 || "", data.jump || "", 
+      data.throw || "",
+      data.total || "", 
+      data.rank || "", 
+      new Date()
     ];
 
     if (rowIndex > 0) {
@@ -277,11 +272,9 @@ function doGet(e) {
       sheet.appendRow(rowData);
     }
 
-    // 持久走の書式設定
     if (sheet.getLastRow() >= 2) {
       sheet.getRange(2, 11, sheet.getLastRow() - 1, 1).setNumberFormat("[m]:ss");
     }
-
     return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
   } catch (f) {
     return ContentService.createTextOutput("Error: " + f.toString()).setMimeType(ContentService.MimeType.TEXT);

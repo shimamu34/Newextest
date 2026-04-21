@@ -34,12 +34,14 @@
             <option value="男">男子</option>
             <option value="女">女子</option>
         </select>
+
         学年：
         <select id="grade">
             <option value="1">中1</option>
             <option value="2" selected>中2</option>
             <option value="3">中3</option>
         </select>
+
         組：
         <select id="class">
             <option value="A">A組</option>
@@ -47,6 +49,7 @@
             <option value="C">C組</option>
             <option value="D">D組</option>
         </select>
+
         測定回：
         <select id="session">
             <option value="1">1回目</option>
@@ -84,9 +87,12 @@
 
     <div id="correlation" style="display:none" class="card">
         <h3 style="text-align:center;color:#9c27b0;margin-bottom:30px">🎮 体力レーダー図鑑 × 目標達成シミュレーター</h3>
+
         <div style="background:linear-gradient(135deg,#667eea,#764ba2); padding:15px 10px; border-radius:15px; margin-bottom:15px; color:white">
             <h4 id="pokedexTitle">🏆 <span id="goalTargetName">あなたの体力タイプ図鑑</span></h4>
-            <div id="fitnessPokedex"></div>
+            <div style="width: 100%; margin: 0; clear: both;">
+                <div id="fitnessPokedex"></div>
+            </div>
             <div id="totalRank" style="margin-top:10px; padding:15px; background:rgba(255,255,255,0.2); border-radius:12px; text-align:center; font-size:18px; font-weight:bold"></div>
         </div>
 
@@ -105,25 +111,85 @@
     <div id="tracking" style="display:none" class="card">
         <div style="background:linear-gradient(135deg,#FF5722,#FF7043); padding:15px; border-radius:20px; margin-bottom:15px; color:white; box-shadow:0 8px 20px rgba(255,87,34,0.25);">
             <h4 style="margin:0 0 12px 0; font-size:18px; font-weight:bold; letter-spacing:1px; text-align: center;">📝 記録を追加</h4>
+            
             <div style="background:rgba(255,255,255,0.15); padding:15px; border-radius:15px;">
                 <div style="display: grid; grid-template-columns: 0.8fr 1.2fr 1fr; gap: 8px; margin-bottom: 10px;">
-                    <div><select id="trackingViewGrade" onchange="updateTrackingView()" style="width:100%; height:38px; border-radius:8px; border:none; font-size:14px; background:white; color:#333;"><option value="1">中1</option><option value="2" selected>中2</option><option value="3">中3</option></select></div>
-                    <div><select id="trackingEvent" style="width:100%; height:38px; border-radius:8px; border:none; font-size:14px; background:white; color:#333;"><option value="0">握力</option><option value="1">上体</option><option value="2">長座</option><option value="3">反復</option><option value="4">持久走</option><option value="5">シャトル</option><option value="6">50m</option><option value="7">立ち幅</option><option value="8">投</option></select></div>
-                    <div><input type="number" id="trackingValue" step="0.1" placeholder="数値" style="width:100%; height:38px; border-radius:8px; border:none; text-align:center;"></div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">学年</label>
+                        <select id="trackingViewGrade" onchange="updateTrackingView()" style="width:100%; height:38px; padding:0 5px; border-radius:8px; border:none; font-size:14px; background:white; color:#333; cursor:pointer;">
+                            <option value="1">中1</option>
+                            <option value="2" selected>中2</option>
+                            <option value="3">中3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">種目</label>
+                        <select id="trackingEvent" style="width:100%; height:38px; padding:0 5px; border-radius:8px; border:none; font-size:14px; background:white; color:#333; cursor:pointer;">
+                            <option value="0">握力</option>
+                            <option value="1">上体起こし</option>
+                            <option value="2">長座体前屈</option>
+                            <option value="3">反復横とび</option>
+                            <option value="4">持久走</option>
+                            <option value="5">20mシャトルラン</option>
+                            <option value="6">50m走</option>
+                            <option value="7">立ち幅跳び</option>
+                            <option value="8">ハンドボール投げ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">測定値</label>
+                        <input type="number" id="trackingValue" step="0.1" placeholder="数値" style="width:100% !important; max-width:none !important; height:38px; padding:0 10px; border-radius:8px; border:none; font-size:14px; background:white; color:#333; box-sizing:border-box; text-align:center;">
+                    </div>
                 </div>
-                <div style="text-align:center;"><button class="btn" style="background:#4CAF50; color:white; font-size:15px; padding:10px 50px; border-radius:12px; font-weight:bold; cursor:pointer;" onclick="addTrackingRecord()">＋ 記録を追加</button></div>
+
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px; margin-bottom: 10px;">
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">単元名 (任意)</label>
+                        <input type="text" id="trackingUnit" placeholder="例: バスケットボール" style="width:100%; height:38px; padding:0 10px; border-radius:8px; border:none; font-size:13px; background:white; color:#333; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">日付</label>
+                        <input type="date" id="trackingDate" style="width:100%; height:38px; padding:0 5px; border-radius:8px; border:none; font-size:13px; background:white; color:#333; box-sizing:border-box; font-family:sans-serif;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">メモ (任意)</label>
+                    <input type="text" id="trackingMemo" placeholder="気づいたことなど" style="width:100%; height:38px; padding:0 10px; border-radius:8px; border:none; font-size:13px; background:white; color:#333; box-sizing:border-box;">
+                </div>
+
+                <div style="text-align:center;">
+                    <button class="btn" style="background:#4CAF50; color:white; font-size:15px; padding:10px 50px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 0 #388E3C; width:auto !important;" onclick="addTrackingRecord()">＋ 記録を追加</button>
+                </div>
             </div>
         </div>
-        <canvas id="trackingGraph" width="1000" height="400" style="max-width:100%"></canvas>
-        <div id="trackingList"></div>
+
+        <div style="background:#f5f5f5;padding:20px;border-radius:15px;margin-bottom:20px">
+            <div style="background:white;padding:15px;border-radius:12px;margin-bottom:15px">
+                <canvas id="trackingGraph" width="1000" height="400" style="max-width:100%"></canvas>
+            </div>
+            <div id="trackingStats" style="background:white;padding:15px;border-radius:12px"></div>
+        </div>
+
+        <div style="background:#f5f5f5;padding:20px;border-radius:15px">
+            <h4 style="margin:0 0 15px 0;font-size:18px;color:#FF5722">📝 記録一覧</h4>
+            <div id="trackingList" style="background:white;border-radius:12px;overflow:hidden"></div>
+        </div>
     </div>
 
     <div class="card no-print">
-        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px;">⭐ 項目別得点表</h2>
+        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px; line-height: 1.2;">
+            ⭐ 項目別得点表
+            <span style="display: block; font-size: 0.4em; font-weight: normal; letter-spacing: 1px; opacity: 0.7; margin-top: 4px;">SCORE METRICS</span>
+        </h2>
         <div id="score"></div>
     </div>
+
     <div class="card no-print">
-        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px;">🏆 総合評価基準表</h2>
+        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px; line-height: 1.2;">
+            🏆 総合評価基準表
+            <span style="display: block; font-size: 0.4em; font-weight: normal; letter-spacing: 1px; opacity: 0.7; margin-top: 4px;">Scoring Benchmarks</span>
+        </h2>
         <div id="eval"></div>
     </div>
 
@@ -140,18 +206,25 @@
                 <input type="number" id="config_studentId" placeholder="12" style="width:100%; padding:12px; border:1.5px solid #ccc; border-radius:8px; box-sizing:border-box;">
             </div>
             <button onclick="saveStudentConfig()" style="width:100%; padding:15px; background:#10B981; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:10px;">💾 設定を保存</button>
-            <button onclick="closeStudentConfig()" style="background:none; border:none; color:#666; cursor:pointer;">閉じる</button>
+            <button onclick="closeStudentConfig()" style="width:100%; padding:10px; background:none; border:none; color:#666; cursor:pointer;">閉じる</button>
         </div>
     </div>
 
     <div id="setupModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;overflow-y:auto">
         <div style="max-width:900px;margin:50px auto;background:white;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-            <div style="text-align:right;margin-bottom:20px"><button onclick="closeSetupGuide()" style="background:none;border:none;font-size:30px;cursor:pointer;color:#666">✕</button></div>
-            <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 30px; font-size: 26px; border-bottom: 3px solid #2b6cb0; padding-bottom: 10px;">🏫 初回セットアップ手順 (GET方式)</h2>
-            <div style="background: #f0f7ff; padding: 20px; border-radius: 12px; border-left: 8px solid #2b6cb0; margin-bottom: 25px;">
-                <p style="margin:0 0 12px 0; font-size:18px;"><strong>1. 専用プログラムをコピーする</strong></p>
-                <button onclick="copyGsCode()" style="width:100%; padding:15px; background:#2b6cb0; color:white; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;">📋 プログラムをコピー</button>
-                <textarea id="gsCodeSource" style="display:none;">
+            <div style="text-align:right;margin-bottom:20px">
+                <button onclick="closeSetupGuide()" style="background:none;border:none;font-size:30px;cursor:pointer;color:#666">✕</button>
+            </div>
+            <div id="setupContent" style="padding: 10px;">
+                <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 30px; font-size: 26px; border-bottom: 3px solid #2b6cb0; padding-bottom: 10px;">🏫 初回セットアップ手順 (決定版)</h2>
+
+                <div style="display: flex; justify-content: center; gap: 30px; align-items: start; max-width: 1000px; margin: 0 auto;">
+                    <div>
+                        <div style="background: #f0f7ff; padding: 20px; border-radius: 12px; border-left: 8px solid #2b6cb0; margin-bottom: 25px;">
+                            <p style="margin:0 0 12px 0; font-size:18px;"><strong>1. 専用プログラムをコピーする</strong></p>
+                            <button onclick="copyGsCode()" style="width:100%; padding:15px; background:#2b6cb0; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;">📋 プログラムをコピー</button>
+
+                            <textarea id="gsCodeSource" style="display:none;">
 function doGet(e) {
   try {
     var data = e.parameter;
@@ -184,23 +257,34 @@ function doGet(e) {
     return ContentService.createTextOutput("Error: " + f.toString()).setMimeType(ContentService.MimeType.TEXT);
   }
 }
-                </textarea>
-            </div>
-            <div style="background: #fff5f0; padding: 25px; border-radius: 12px; border: 3px solid #FF5722;">
-                <p style="margin:0 0 15px 0; font-size:18px;"><strong>2. デプロイURLを保存</strong></p>
-                <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." style="width:100%; padding:15px; margin-bottom:15px; border: 2px solid #ccc; border-radius: 8px;">
-                <button onclick="saveGasUrl()" style="width:100%; padding:15px; background:#FF5722; color:white; border-radius:8px; font-weight:bold; cursor:pointer;">💾 設定を保存して配布URLを作成</button>
-                <div id="studentUrlArea" style="display:none; margin-top: 25px; border-top: 2px dashed #FF5722; padding-top:15px;">
-                    <p style="font-weight:bold;">生徒配布用URL：</p>
-                    <input type="text" id="studentDistUrlInput" readonly style="width:100%; padding:12px; background: #f8f8f8; border: 1px solid #ccc;">
-                    <button onclick="copyStudentUrl()" style="width:100%; padding:15px; background:#4CAF50; color:white; border-radius:8px; margin-top:10px; font-weight:bold;">📋 配布URLをコピー</button>
+                            </textarea>
+                        </div>
+                        <div style="background: #fdfaea; padding: 15px 20px 2px 20px; border-left: 8px solid #f6ad55; margin-bottom: 20px; border-radius: 12px;">
+                            <p style="margin:0 0 10px 0; font-size:18px;"><strong>2. スプレッドシートの設定</strong></p>
+                            <ol style="font-size: 15px; margin:0; padding-left:22px; line-height:1.4;">
+                                <li>「拡張機能」➔「Apps Script」を開き、1でコピーしたコードを<b>全て上書き</b>。</li>
+                                <li>右上の<b>「デプロイ」➔「新しいデプロイ」</b>。</li>
+                                <li>種類：<b>ウェブアプリ</b>、アクセス：<b>全員</b>にしてデプロイ。</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div style="position: sticky; top: 0;">
+                        <div style="background: #fff5f0; padding: 25px; border-radius: 12px; border: 3px solid #FF5722;">
+                            <p style="margin:0 0 15px 0; font-size:18px;"><strong>3. URLの登録と保存</strong></p>
+                            <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." style="width:100%; padding:15px; margin-bottom:15px; border: 2px solid #ccc; border-radius: 8px;">
+                            <button onclick="saveGasUrl()" style="width:100%; padding:15px; background:#FF5722; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">💾 設定を保存して配布URLを作成</button>
+                            <div id="studentUrlArea" style="display:none; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #FF5722;">
+                                <p style="font-weight:bold;">✅ 生徒に配布するURL：</p>
+                                <input type="text" id="studentDistUrlInput" readonly style="width:100%; padding:12px; font-size:12px; background: #f8f8f8; border: 1px solid #ccc; margin-bottom: 15px;">
+                                <button onclick="copyStudentUrl()" style="width:100%; padding:15px; background:#4CAF50; color:white; border:none; border-radius:8px; font-weight:bold;">📋 配布URLをコピー</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="backupModal" class="modal no-print"><div class="modal-content"><h2>📲 バックアップ</h2><textarea id="backupData" style="width:100%;height:100px;"></textarea><button onclick="closeModal('backupModal')">閉じる</button></div></div>
-    <div id="memoModal" class="modal no-print"><div class="modal-content"><h2>📝 メモ</h2><textarea id="memoInput" style="width:100%;height:100px;"></textarea><button onclick="closeModal('memoModal')">閉じる</button></div></div>
 
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
@@ -209,29 +293,43 @@ function doGet(e) {
 
     <script>
         function checkPasscode() {
-            const code = prompt("パスコードを入力(9076)");
-            if (code === "9076") showSetupGuide();
-            else if (code !== null) alert("パスコードが違います。");
+            const code = prompt("管理者用パスコードを入力してください（4桁）");
+            if (code === "9076") {
+                showSetupGuide();
+            } else if (code !== null) {
+                alert("パスコードが違います。");
+            }
         }
-        function showSetupGuide() { document.getElementById('setupModal').style.display = "block"; }
-        function closeSetupGuide() { document.getElementById('setupModal').style.display = 'none'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // 本人登録制御
         function openStudentConfig() {
             document.getElementById('config_name').value = localStorage.getItem('studentName') || "";
             document.getElementById('config_studentId').value = localStorage.getItem('studentId') || "";
             document.getElementById('studentConfigModal').style.display = "block";
         }
-        function closeStudentConfig() { document.getElementById('studentConfigModal').style.display = "none"; }
+        function closeStudentConfig() {
+            document.getElementById('studentConfigModal').style.display = "none";
+        }
         function saveStudentConfig() {
             const name = document.getElementById('config_name').value.trim();
             const id = document.getElementById('config_studentId').value.trim();
             if (!name || !id) { alert("氏名と出席番号を入力してください。"); return; }
             localStorage.setItem('studentName', name);
             localStorage.setItem('studentId', id);
-            if (typeof N === 'function') N('情報を保存しました', 'success');
+            if (typeof N === 'function') N('本人情報を保存しました', 'success');
             closeStudentConfig();
+        }
+
+        function showSetupGuide() {
+            const gasInput = document.getElementById('gasUrlInput');
+            const distInput = document.getElementById('studentDistUrlInput');
+            const urlArea = document.getElementById('studentUrlArea');
+            if (gasInput) gasInput.value = "";
+            if (distInput) distInput.value = "";
+            if (urlArea) urlArea.style.display = "none";
+            document.getElementById('setupModal').style.display = "block";
+        }
+        function closeSetupGuide() {
+            document.getElementById('setupModal').style.display = 'none';
         }
 
         document.addEventListener('DOMContentLoaded', function() {

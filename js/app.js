@@ -364,26 +364,19 @@ function updateTimestamp() {
 }
 
 function sendToTeacher() {
-    // 1. 本人登録情報の取得（localStorageから）
     const name = localStorage.getItem('studentName');
     const studentId = localStorage.getItem('studentId');
     const gasUrl = localStorage.getItem('gasUrl') || localStorage.getItem('teacherScriptUrl');
 
-    // 2. 登録がない場合はエラーを出す
     if (!name || !studentId) {
-        alert("先に「本人登録」ボタンから名前と出席番号を登録してください。");
-        if (typeof openStudentConfig === 'function') openStudentConfig(); // 登録画面を開く
+        alert("先に「本人登録」をしてください。");
+        openStudentConfig();
         return;
     }
-
-    if (!gasUrl) {
-        alert("送信先URLが設定されていません。管理者設定を確認してください。");
-        return;
-    }
+    if (!gasUrl) { alert("送信先URLが設定されていません。"); return; }
 
     if (typeof N === 'function') N('送信中...', 'info');
 
-    // 3. 持久走データの整形（秒を 分:秒 に）
     let enduranceVal = document.getElementById('i4').value || "";
     if (enduranceVal !== "") {
         const totalSec = parseInt(enduranceVal);
@@ -392,7 +385,7 @@ function sendToTeacher() {
         enduranceVal = `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    // 4. 送信データの作成
+    // 送信データの作成
     const payload = {
         name: name,
         studentId: studentId,
@@ -408,24 +401,20 @@ function sendToTeacher() {
         shuttle: document.getElementById('i5').value || "",
         sprint50: document.getElementById('i6').value || "",
         jump: document.getElementById('i7').value || "",
-        throw: document.getElementById('i8').value || ""
+        throw: document.getElementById('i8').value || "",
+        // ↓ここを追加（画面上の合計点と評価を取得）
+        total: document.getElementById('total').innerText,
+        rank: document.getElementById('rank').innerText
     };
 
-    // 5. GET通信の実行
     const params = new URLSearchParams(payload);
-
-    fetch(`${gasUrl}?${params.toString()}`, {
-        method: 'GET',
-        mode: 'no-cors'
-    })
+    fetch(`${gasUrl}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
     .then(() => {
-        if (typeof N === 'function') N('送信完了しました！', 'success');
+        if (typeof N === 'function') N('送信完了！', 'success');
         alert(`${name}さんのデータを送信しました。`);
     })
     .catch(err => {
-        console.error("Fetch error:", err);
-        if (typeof N === 'function') N('送信失敗', 'error');
-        alert('エラーが発生しました。ブラウザで開き直してください。');
+        alert('エラーが発生しました。');
     });
 }
 

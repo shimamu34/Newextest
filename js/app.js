@@ -408,7 +408,7 @@ function sendToTeacher() {
         jump: document.getElementById('i7').value || "",
         throw: document.getElementById('i8').value || "",
         total: document.getElementById('total').innerText, // 合計点
-        rank: document.getElementById('rank').innerText    // A～E評価
+        rank: document.getElementById('rank').innerText    // 評価(A～E)
     };
 
     const params = new URLSearchParams(payload);

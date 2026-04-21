@@ -284,33 +284,33 @@ function U(isInitial = false) {
     }
 }
 
+// 目標の計算とUI更新
 function UT() {
     const g = document.getElementById("gender").value;
     const gr = parseInt(document.getElementById("grade").value);
     const h = D[g].h;
     let tScores = [];
 
-    // 1. 各項目の得点を計算
     for (let i = 0; i < 9; i++) {
         const val = parseFloat(document.getElementById(`t-i${i}`).value);
-        const display = document.getElementById(`ts-i${i}`);
+        const scoreDisplay = document.getElementById(`ts-i${i}`);
         
         if (!isNaN(val) && val > 0) {
             const sc = CS(val, h[i], g);
             tScores.push(sc);
-            display.textContent = sc + "点";
+            scoreDisplay.textContent = sc + "点";
         } else {
             tScores.push(0);
-            display.textContent = "-";
+            scoreDisplay.textContent = "-";
         }
     }
 
-    // 2. 目標合計点の計算（持久走とシャトルランの大きい方を採用）
+    // 目標の合計点（持久走/シャトルランの大きい方を採用）
     const tTotal = tScores[0] + tScores[1] + tScores[2] + tScores[3] + 
                    Math.max(tScores[4], tScores[5]) + 
                    tScores[6] + tScores[7] + tScores[8];
 
-    // 3. ランク判定
+    // 目標のランク判定
     let tRank = "E";
     for (let i = 0; i < E.length; i++) {
         const criteria = E[i][`c${gr}`];
@@ -318,18 +318,47 @@ function UT() {
         if (criteria.includes("以上")) { min = parseFloat(criteria); max = 100; }
         else if (criteria.includes("以下")) { min = 0; max = parseFloat(criteria); }
         else { [min, max] = criteria.split("～").map(Number); }
-        
         if (tTotal >= min && tTotal <= max) { tRank = E[i].s; break; }
     }
 
-    // 4. 結果を表示
-    const summary = document.getElementById("target-summary");
-    if (tTotal > 0) {
-        summary.style.display = "block";
-        document.getElementById("t-total").textContent = tTotal;
-        document.getElementById("t-rank").textContent = tRank;
-    } else {
-        summary.style.display = "none";
+    // 右端の合計・ランク表示を更新
+    const totalArea = document.getElementById("t-i9");
+    if (totalArea) {
+        totalArea.querySelectorAll("div")[0].textContent = tTotal;
+        totalArea.querySelectorAll("div")[1].textContent = tRank;
+    }
+
+    // 目標を保存
+    SIT();
+}
+
+// 目標をlocalStorageに保存
+function SIT() {
+    const g = document.getElementById("gender").value;
+    const gr = document.getElementById("grade").value;
+    const key = "target-y-" + g;
+    let v = [];
+    for (let i = 0; i < 9; i++) {
+        v.push(document.getElementById(`t-i${i}`).value || "");
+    }
+    let allData = JSON.parse(localStorage.getItem(key) || "{}");
+    allData[gr] = v;
+    localStorage.setItem(key, JSON.stringify(allData));
+}
+
+// 目標をlocalStorageから読み込み
+function LT() {
+    const g = document.getElementById("gender").value;
+    const gr = document.getElementById("grade").value;
+    const allData = JSON.parse(localStorage.getItem("target-y-" + g) || '{}');
+    const data = allData[gr];
+
+    if (data) {
+        data.forEach((val, i) => {
+            const input = document.getElementById(`t-i${i}`);
+            if (input) input.value = val;
+        });
+        UT(); // 読み込んだ後に計算を実行して得点を表示
     }
 }
 

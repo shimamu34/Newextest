@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中学体力テスト記録システム</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <h1 style="letter-spacing: 4px; font-family: 'Helvetica Neue', Arial, sans-serif;">
+        📠　体力テスト分析システム
+        <span style="display: block; font-size: 0.5em; font-weight: normal; letter-spacing: 1px; opacity: 0.8; margin-top: 5px;">
+            Physical Analysis System 2025
+        </span>
+    </h1>
+
+    <div class="card no-print" style="text-align:center">
+        <button class="btn" style="background:linear-gradient(135deg,#10B981,#059669); color:white;" onclick="openStudentConfig()">👤 本人登録</button>
+        <button class="btn" style="background:linear-gradient(135deg,#4A5568,#2D3748); color:white;" onclick="showBackupModal()">📲 バックアップ</button>
+        <button class="btn btn-clear" onclick="C()">🗑️ クリア</button>
+        <button class="btn btn-print" onclick="preparePrint()">🖨️ 印刷</button>
+        <button class="btn" style="background:linear-gradient(135deg,#718096,#4A5568); color:white;" onclick="showMemoModal()">📝 メモ(任意)</button>
+        <button class="btn" style="background:linear-gradient(135deg,#6366f1,#4338ca); color:white;" onclick="takeScreenshot()">📸 画像保存</button>
+        <button class="btn btn-send" onclick="sendToTeacher()">📤 先生に送信</button>
+        <button class="btn btn-setup" onclick="checkPasscode()">⚙️ 初回設定</button>
+    </div>
+
+    <div class="card no-print" style="text-align:center">
+        性別：
+        <select id="gender" onchange="RR(this.value)">
+            <option value="男">男子</option>
+            <option value="女">女子</option>
+        </select>
+
+        学年：
+        <select id="grade">
+            <option value="1">中1</option>
+            <option value="2" selected>中2</option>
+            <option value="3">中3</option>
+        </select>
+
+        組：
+        <select id="class">
+            <option value="A">A組</option>
+            <option value="B">B組</option>
+            <option value="C">C組</option>
+            <option value="D">D組</option>
+        </select>
+
+        測定回：
+        <select id="session">
+            <option value="1">1回目</option>
+            <option value="2">2回目</option>
+            <option value="3">3回目</option>
+        </select>
+    </div>
+
+    <div class="card">
+        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px;">
+            📈 個人測定ログ
+            <span style="display: block; font-size: 0.4em; font-weight: normal; opacity: 0.7; margin-top: 4px;">MY PERFORMANCE RECORD</span>
+        </h2>
+        <div id="table"></div>
+    </div>
+
+    <div class="card no-print" style="text-align:center">
+        <button class="btn" style="background:linear-gradient(135deg,#2c5282,#2b6cb0)" onclick="toggleRadar()">📊 レーダーチャート</button>
+        <button class="btn" style="background:linear-gradient(135deg,#F59E0B,#D97706)" onclick="toggleRanking()">🥇 種目別ランキング</button>
+        <button class="btn" style="background:linear-gradient(135deg,#9c27b0,#7b1fa2)" onclick="toggleAnalysis()">🎮 体力分析</button>
+        <button class="btn" style="background:linear-gradient(135deg,#FF5722,#FF7043)" onclick="toggleTracking()">📈 種目別トラッキング</button>
+    </div>
+
+    <div id="radar" style="display:none" class="card">
+        <h3 style="text-align:center;color:#2b6cb0;margin-bottom:20px">📊 レーダーチャート</h3>
+        <div style="display:flex;justify-content:center">
+            <canvas id="rc" width="600" height="600"></canvas>
+        </div>
+    </div>
+
+    <div id="ranking" style="display:none" class="card">
+    <h3 style="text-align:center;color:#D97706;margin-bottom:20px">🥇 種目別ランキング</h3>
+    <div id="rankingListArea"></div>
+</div>
+
+    <div id="correlation" style="display:none" class="card">
+        <h3 style="text-align:center;color:#9c27b0;margin-bottom:30px">🎮 体力レーダー図鑑 × 目標達成シミュレーター</h3>
+
+        <div style="background:linear-gradient(135deg,#667eea,#764ba2); padding:15px 10px; border-radius:15px; margin-bottom:15px; color:white">
+            <h4 id="pokedexTitle">🏆 <span id="goalTargetName">あなたの体力タイプ図鑑</span></h4>
+            <div style="width: 100%; margin: 0; clear: both;">
+                <div id="fitnessPokedex"></div>
+            </div>
+            <div id="totalRank" style="margin-top:10px; padding:15px; background:rgba(255,255,255,0.2); border-radius:12px; text-align:center; font-size:18px; font-weight:bold"></div>
+        </div>
+
+        <div style="background:#f5f5f5;padding:30px;border-radius:15px">
+            <div style="display: flex !important; flex-wrap: nowrap !important; justify-content: center; max-width: 1000px; margin: 0 auto 25px auto; text-align: center; width: calc(100% + 10px); transform: translateX(-5px);">
+                <button class="btn" style="flex: 1 !important; min-width: 0 !important; margin: 0 5px !important; background:linear-gradient(135deg,#FFD700,#FFA500); padding: 18px 2px; font-size: 16px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); white-space: nowrap;" onclick="setGoal('rankA')">総合A評価を目指す</button>
+                <button class="btn" style="flex: 1 !important; min-width: 0 !important; margin: 0 5px !important; background:linear-gradient(135deg,#4CAF50,#66BB6A); padding: 18px 2px; font-size: 16px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); white-space: nowrap;" onclick="setGoal('rankB')">総合B評価を目指す</button>
+                <button class="btn" style="flex: 1 !important; min-width: 0 !important; margin: 0 5px !important; background:linear-gradient(135deg,#2196F3,#42A5F5); padding: 18px 2px; font-size: 16px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); white-space: nowrap;" onclick="setGoal('rankC')">総合C評価を目指す</button>
+                <button class="btn" style="flex: 1 !important; min-width: 0 !important; margin: 0 5px !important; background:linear-gradient(135deg,#9C27B0,#BA68C8); padding: 18px 2px; font-size: 16px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); white-space: nowrap;" onclick="setGoal('rankD')">総合D評価を目指す</button>
+            </div>
+            <p id="guide" style="text-align:center; color: #666; font-size: 16px; margin-top: 20px;">上のボタンから目標を選んでください</p>
+            <div id="goalSimulator"></div>
+        </div>
+    </div>
+
+    <div id="tracking" style="display:none" class="card">
+        <div style="background:linear-gradient(135deg,#FF5722,#FF7043); padding:15px; border-radius:20px; margin-bottom:15px; color:white; box-shadow:0 8px 20px rgba(255,87,34,0.25);">
+            <h4 style="margin:0 0 12px 0; font-size:18px; font-weight:bold; letter-spacing:1px; text-align: center;">📝 記録を追加</h4>
+            
+            <div style="background:rgba(255,255,255,0.15); padding:15px; border-radius:15px;">
+                <div style="display: grid; grid-template-columns: 0.8fr 1.2fr 1fr; gap: 8px; margin-bottom: 10px;">
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">学年</label>
+                        <select id="trackingViewGrade" onchange="updateTrackingView()" style="width:100%; height:38px; padding:0 5px; border-radius:8px; border:none; font-size:14px; background:white; color:#333; cursor:pointer;">
+                            <option value="1">中1</option>
+                            <option value="2" selected>中2</option>
+                            <option value="3">中3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">種目</label>
+                        <select id="trackingEvent" style="width:100%; height:38px; padding:0 5px; border-radius:8px; border:none; font-size:14px; background:white; color:#333; cursor:pointer;">
+                            <option value="0">握力</option>
+                            <option value="1">上体起こし</option>
+                            <option value="2">長座体前屈</option>
+                            <option value="3">反復横とび</option>
+                            <option value="4">持久走</option>
+                            <option value="5">20mシャトルラン</option>
+                            <option value="6">50m走</option>
+                            <option value="7">立ち幅跳び</option>
+                            <option value="8">ハンドボール投げ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">測定値</label>
+                        <input type="number" id="trackingValue" step="0.1" placeholder="数値" style="width:100% !important; max-width:none !important; height:38px; padding:0 10px; border-radius:8px; border:none; font-size:14px; background:white; color:#333; box-sizing:border-box; text-align:center;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px; margin-bottom: 10px;">
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">単元名 (任意)</label>
+                        <input type="text" id="trackingUnit" placeholder="例: バスケットボール" style="width:100%; height:38px; padding:0 10px; border-radius:8px; border:none; font-size:13px; background:white; color:#333; box-sizing:border-box;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">日付</label>
+                        <input type="date" id="trackingDate" style="width:100%; height:38px; padding:0 5px; border-radius:8px; border:none; font-size:13px; background:white; color:#333; box-sizing:border-box; font-family:sans-serif;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; opacity:0.9; text-align:center;">メモ (任意)</label>
+                    <input type="text" id="trackingMemo" placeholder="気づいたことなど" style="width:100%; height:38px; padding:0 10px; border-radius:8px; border:none; font-size:13px; background:white; color:#333; box-sizing:border-box;">
+                </div>
+
+                <div style="text-align:center;">
+                    <button class="btn" style="background:#4CAF50; color:white; font-size:15px; padding:10px 50px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 0 #388E3C; width:auto !important;" onclick="addTrackingRecord()">＋ 記録を追加</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="background:#f5f5f5;padding:20px;border-radius:15px;margin-bottom:20px">
+            <div style="background:white;padding:15px;border-radius:12px;margin-bottom:15px">
+                <canvas id="trackingGraph" width="1000" height="400" style="max-width:100%"></canvas>
+            </div>
+            <div id="trackingStats" style="background:white;padding:15px;border-radius:12px"></div>
+        </div>
+
+        <div style="background:#f5f5f5;padding:20px;border-radius:15px">
+            <h4 style="margin:0 0 15px 0;font-size:18px;color:#FF5722">📝 記録一覧</h4>
+            <div id="trackingList" style="background:white;border-radius:12px;overflow:hidden"></div>
+        </div>
+    </div>
+
+    <div class="card no-print">
+        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px; line-height: 1.2;">
+            ⭐ 項目別得点表
+            <span style="display: block; font-size: 0.4em; font-weight: normal; letter-spacing: 1px; opacity: 0.7; margin-top: 4px;">SCORE METRICS</span>
+        </h2>
+        <div id="score"></div>
+    </div>
+
+    <div class="card no-print">
+        <h2 style="color:#2b6cb0; font-family: 'Helvetica Neue', Arial, sans-serif; letter-spacing: 2px; line-height: 1.2;">
+            🏆 総合評価基準表
+            <span style="display: block; font-size: 0.4em; font-weight: normal; letter-spacing: 1px; opacity: 0.7; margin-top: 4px;">Scoring Benchmarks</span>
+        </h2>
+        <div id="eval"></div>
+    </div>
+
+    <div id="notif" class="notification"></div>
+
+    <div id="studentConfigModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000;">
+    <div style="max-width:400px; margin:100px auto; background:white; border-radius:15px; padding:30px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3)">
+        <h2 style="color:#10B981; margin-bottom:15px;">👤 本人登録</h2>
+        <p style="font-size:13px; color:#666; margin-bottom:20px;">一度登録すれば、送信時に名前を打つ手間がなくなります。</p>
+        <div style="text-align:left; margin-bottom:20px;">
+            <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">氏名</label>
+            <input type="text" id="config_name" placeholder="体力 太郎" style="width:100%; padding:12px; border:1.5px solid #ccc; border-radius:8px; box-sizing:border-box; margin-bottom:15px;">
+            <label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">出席番号</label>
+            <input type="number" id="config_studentId" placeholder="12" style="width:100%; padding:12px; border:1.5px solid #ccc; border-radius:8px; box-sizing:border-box;">
+        </div>
+        <button onclick="saveStudentConfig()" style="width:100%; padding:15px; background:#10B981; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:10px;">💾 設定を保存</button>
+        <button onclick="closeStudentConfig()" style="width:100%; padding:10px; background:none; border:none; color:#666; cursor:pointer;">閉じる</button>
+    </div>
+</div>
+<div id="setupModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;overflow-y:auto">
+
+    <div id="setupModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:2000;overflow-y:auto">
+        <div style="max-width:900px;margin:50px auto;background:white;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+            <div style="text-align:right;margin-bottom:20px">
+                <button onclick="closeSetupGuide()" style="background:none;border:none;font-size:30px;cursor:pointer;color:#666">✕</button>
+            </div>
+            <div id="setupContent" style="padding: 10px;">
+                <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 30px; font-size: 26px; border-bottom: 3px solid #2b6cb0; padding-bottom: 10px;">🏫 初回セットアップ手順</h2>
+
+                <div style="display: flex; justify-content: center; gap: 30px; align-items: start; max-width: 1000px; margin: 0 auto;">
+                    <div>
+                        <div style="background: #f0f7ff; padding: 20px; border-radius: 12px; border-left: 8px solid #2b6cb0; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <p style="margin:0 0 12px 0; font-size:18px;"><strong>1. 専用プログラムをコピーする</strong></p>
+                            <p style="font-size: 14px; color: #555; margin-bottom: 15px; line-height: 1.6;">集計用のプログラムコードをコピーします。この後の手順でスプレッドシートに貼り付けます。</p>
+                            <button onclick="copyGsCode()" style="width:100%; padding:15px; background:#2b6cb0; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px; transition: 0.3s;">📋 プログラムをコピー</button>
+
+                            <textarea id="gsCodeSource" style="display:none;">
+function doPost(e) {
+  try {
+    // 1. 届いたデータを解析
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // 2. シート名を決定（例：1年-1組-1回目）
+    // 組や回が違えば自動的に別のシートが作られるため、データは混ざりません
+    var sheetName = data.grade + "年-" + data.class + "組-" + data.session + "回目";
+    var sheet = ss.getSheetByName(sheetName);
+
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      // 見出しを作成（初期状態）
+      sheet.appendRow(['出席番号', '氏名', '性別', '学年', '組', '回', '握力', '上体', '長座', '反復', '持久', 'シャトル', '50m', '立ち幅', '投', '日時']);
+    }
+
+    // 3. 出席番号を半角数字に変換（全角入力対策）
+    var sId = data.studentId ? String(data.studentId).replace(/[０-９]/g, function(s) {
+      return String.fromCharCode(s.charCodeAt(0) - 65248);
+    }) : "";
+
+    // 4. 上書き判定ロジック
+    // 「出席番号(0番目)」と「学年(3番目)」が一致するかだけで判定
+    // これにより、氏名の漢字ミスやスペースの有無に左右されず上書きされます
+    var rows = sheet.getDataRange().getValues();
+    var rowIndex = -1;
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][0] == sId && rows[i][3] == data.grade) {
+        rowIndex = i + 1;
+        break;
+      }
+    }
+
+    // 5. 保存するデータの配列
+    var rowData = [
+      sId,
+      data.name || "",
+      (data.gender === 'male' || data.gender === '男' || data.gender === '男子') ? '男子' : '女子',
+      data.grade || "",
+      data.class || "",
+      data.session || "",
+      data.grip || "",
+      data.situp || "",
+      data.forward || "",
+      data.sidestep || "",
+      data.endurance || "", // 持久走（左から11番目：K列）
+      data.shuttle || "",
+      data.sprint50 || "",
+      data.jump || "",
+      data.throw || "",
+      new Date() // 送信日時
+    ];
+
+    // 6. 保存の実行
+    if (rowIndex > 0) {
+      // 既存の行を最新データで更新（名前も最新の内容に書き換わります）
+      sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+    } else {
+      // 新しい出席番号なら最後尾に追加
+      sheet.appendRow(rowData);
+    }
+
+    // 7. 持久走（K列/11番目）を「経過時間」書式に自動設定
+    // 毎回実行することで、新しい行が増えても常に「分:秒」として計算可能になります
+    var enduranceCol = 11;
+    var lastRow = sheet.getLastRow();
+    if (lastRow >= 2) {
+      sheet.getRange(2, enduranceCol, lastRow - 1).setNumberFormat("[m]:ss");
+    }
+
+    return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
+  } catch (f) {
+    return ContentService.createTextOutput("Error: " + f.toString()).setMimeType(ContentService.MimeType.TEXT);
+  }
+}
+                            </textarea>
+                        </div>
+
+                        <div style="background: #fdfaea; padding: 15px 20px 2px 20px; border-left: 8px solid #f6ad55; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 12px;">
+                            <p style="margin:0 0 10px 0; font-size:18px;"><strong>2. スプレッドシートの設定</strong></p>
+                            <ol style="font-size: 15px; margin:0; padding-left:22px; line-height:1.4; color:#333;">
+                                <li style="margin-bottom: 4px;"><a href="https://sheets.new/" target="_blank" style="color:#2b6cb0; font-weight:bold; text-decoration: underline;">新規スプレッドシート</a>を作成します。</li>
+                                <li style="margin-bottom: 4px;">上のメニューから<b>「拡張機能」➔「Apps Script」</b>を開く。</li>
+                                <li style="margin-bottom: 4px;">元からあるコードを全て消して、1でコピーしたコードを<b>貼り付け</b>。</li>
+                                <li style="margin-bottom: 4px;">右上の青い<b>「デプロイ」➔「新しいデプロイ」</b>をクリック。</li>
+                                <li style="margin-bottom: 4px;">種類（歯車）から<b>「ウェブアプリ」</b>を選択。</li>
+                                <li style="margin-bottom: 0;">設定を以下にしてデプロイを押してください。
+                                    <ul style="margin: 2px 0 0 0; padding-left: 20px; color: #c53030; list-style-type: '● ';">
+                                        <li style="margin-bottom: 2px;">次のユーザーとして実行：<b>自分</b></li>
+                                        <li style="margin-bottom: 0;">アクセスできるユーザー：<b>全員</b></li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div style="padding: 18px; background: #fff; border: 2px dashed #f6ad55; border-radius: 12px; font-size: 14px; color: #444; line-height: 1.6;">
+                            <p style="font-weight: bold; margin:0 0 8px 0; color:#d69e2e; font-size: 16px;">⚠️ 「承認」画面が出た場合の対処：</p>
+                            1. 自分のアカウントを選択。<br>
+                            2. 警告画面で左下の<b>「詳細を表示(Advanced)」</b>をクリック。<br>
+                            3. 一番下の<b>「Go to 無題のプロジェクト(unsafe).」</b>をクリック。<br>
+                            4. 次のページの「許可 or Continue」を押せば完了です。
+                        </div>
+                    </div>
+
+                    <div style="position: sticky; top: 0;">
+                        <div style="background: #fff5f0; padding: 25px; border-radius: 12px; border: 3px solid #FF5722; box-shadow: 0 6px 12px rgba(0,0,0,0.1);">
+                            <p style="margin:0 0 15px 0; font-size:18px;"><strong>3. URLの登録と保存</strong></p>
+                            <p style="font-size: 14px; margin-bottom: 15px; line-height: 1.6;">最後に、スプレッドシートで発行された<b>「ウェブアプリURL」</b>をここに貼り付けて保存してください。</p>
+
+                            <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." style="width:100%; padding:15px; margin-bottom:15px; border: 2px solid #ccc; border-radius: 8px; box-sizing:border-box; font-size:14px;">
+
+                            <button onclick="saveGasUrl()" style="width:100%; padding:15px; background:#FF5722; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">💾 設定を保存して配布URLを作成</button>
+
+                            <div id="studentUrlArea" style="display:none; margin-top: 25px; padding-top: 20px; border-top: 2px dashed #FF5722;">
+                                <p style="font-size: 15px; font-weight:bold; color:#2d3748; margin-bottom:10px;">✅ 準備完了！生徒に配布するURL：</p>
+                                <input type="text" id="studentDistUrlInput" readonly style="width:100%; padding:12px; font-size:12px; background: #f8f8f8; border: 1px solid #ccc; margin-bottom: 15px; box-sizing:border-box; color: #555;">
+                                <button onclick="copyStudentUrl()" style="width:100%; padding:15px; background:#4CAF50; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;">📋 配布URLをコピー</button>
+                                <p style="font-size: 12px; color: #666; margin-top: 10px; text-align: center;">このURLを生徒の端末で開かせてください。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/setup.js"></script>
+
+    <script>
+        // 1. パスコードをチェックする関数
+        function checkPasscode() {
+            const code = prompt("管理者用パスコードを入力してください（4桁）");
+            if (code === "9076") {
+                showSetupGuide();
+            } else if (code !== null) {
+                alert("パスコードが違います。");
+            }
+        }
+
+function openStudentConfig() {
+    document.getElementById('config_name').value = localStorage.getItem('studentName') || "";
+    document.getElementById('config_studentId').value = localStorage.getItem('studentId') || "";
+    document.getElementById('studentConfigModal').style.display = "block";
+}
+function closeStudentConfig() {
+    document.getElementById('studentConfigModal').style.display = "none";
+}
+function saveStudentConfig() {
+    const name = document.getElementById('config_name').value.trim();
+    const id = document.getElementById('config_studentId').value.trim();
+    if (!name || !id) { alert("氏名と出席番号を入力してください。"); return; }
+    localStorage.setItem('studentName', name);
+    localStorage.setItem('studentId', id);
+    if (typeof N === 'function') N('本人情報を保存しました', 'success');
+    closeStudentConfig();
+}
+
+        // 2. 設定画面を表示する関数
+        function showSetupGuide() {
+            const gasInput = document.getElementById('gasUrlInput');
+            const distInput = document.getElementById('studentDistUrlInput');
+            const urlArea = document.getElementById('studentUrlArea');
+            if (gasInput) gasInput.value = "";
+            if (distInput) distInput.value = "";
+            if (urlArea) urlArea.style.display = "none";
+            document.getElementById('setupModal').style.display = "block";
+        }
+
+        // 3. ページ読み込み・切り替え時の処理
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初期読み込み
+            if (typeof L === 'function') L();
+
+            // 性別・学年が変更された時の連動設定
+            const updateAll = () => {
+                if (typeof RT === 'function') RT(); // テーブル基準更新
+                if (typeof L === 'function') L(); // データ読み込み
+                if (typeof U === 'function') U(); // 計算と描画
+            };
+
+            document.getElementById("gender").addEventListener("change", updateAll);
+            document.getElementById("grade").addEventListener("change", updateAll);
+        });
+    </script>
+</body>
+
+</html>

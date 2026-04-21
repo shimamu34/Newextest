@@ -235,7 +235,6 @@ function doGet(e) {
     var sheetName = g + "年-" + c + "組-" + s + "回目";
     var sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName);
 
-    // 見出しに「合計点」と「評価」を追加
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(['出席番号', '氏名', '性別', '学年', '組', '回', '握力', '上体', '長座', '反復', '持久', 'シャトル', '50m', '立ち幅', '投', '合計点', '評価', '日時']);
     }
@@ -253,17 +252,11 @@ function doGet(e) {
       }
     }
 
-    // 保存データに合計点(data.total)と評価(data.rank)を挿入
     var rowData = [
-      sId, data.name || "", 
-      (data.gender === '男' || data.gender === '男子') ? '男子' : '女子',
-      g, c, s, 
-      data.grip || "", data.situp || "", data.forward || "", data.sidestep || "",
-      data.endurance || "", data.shuttle || "", data.sprint50 || "", data.jump || "", 
-      data.throw || "",
-      data.total || "", 
-      data.rank || "", 
-      new Date()
+      sId, data.name || "", (data.gender === '男' || data.gender === '男子') ? '男子' : '女子',
+      g, c, s, data.grip, data.situp, data.forward, data.sidestep, data.endurance, 
+      data.shuttle, data.sprint50, data.jump, data.throw, 
+      data.total || "0", data.rank || "E", new Date()
     ];
 
     if (rowIndex > 0) {
@@ -271,7 +264,7 @@ function doGet(e) {
     } else {
       sheet.appendRow(rowData);
     }
-
+    
     if (sheet.getLastRow() >= 2) {
       sheet.getRange(2, 11, sheet.getLastRow() - 1, 1).setNumberFormat("[m]:ss");
     }

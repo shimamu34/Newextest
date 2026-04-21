@@ -116,7 +116,6 @@ function RT() {
     h.forEach(x => s += `<th>${x}</th>`);
     s += '</tr>';
 
-    // 行の構成（目標と目標得点を追加）
     const rows = ["記録", "目標", "目標得点", "帯広市", "北海道", "全国"];
 
     rows.forEach(r => {
@@ -126,38 +125,39 @@ function RT() {
         if (r === "目標得点") trStyle = 'style="background:#f0fff4; font-size:0.8em; color:#2f855a;"';
         
         if (r === "北海道" || r === "全国") {
-            label = `<div>${r}</div><div style="font-size:0.8em; color:#666; font-weight:normal;">(R7)</div>`;
+            label = `<div>${r}</div><div style="font-size:0.8em; color:#666;">(R7)</div>`;
         }
 
         s += `<tr ${trStyle}><td>${label}</td>`;
 
         h.forEach((x, j) => {
             if (r === "記録") {
-                // --- 自分の記録入力（既存通り） ---
+                // 自分の記録（既存通り）
                 if (j === 4) { 
-                    s += `<td style="padding:2px;"><div style="display:flex;justify-content:center;gap:2px;"><input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:<input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;"></div><input type="hidden" id="i4"></td>`;
+                    s += `<td><div style="display:flex;justify-content:center;gap:2px;"><input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:<input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;"></div><input type="hidden" id="i4"></td>`;
                 } else if (j < 9) {
                     s += `<td><input type="number" id="i${j}" class="v-in" onchange="U()" step="0.1" style="width:100%;"></td>`;
                 } else {
                     s += `<td id="i9"><div>0</div><div>E</div></td>`;
                 }
             } else if (r === "目標") {
-                // --- ★目標入力欄 ---
+                // ★目標数値の行
                 if (j < 9) {
                     s += `<td><input type="number" id="t-i${j}" class="t-in" oninput="UT()" step="0.1" style="width:100%; border:1px solid #38b2ac; border-radius:4px; text-align:center;"></td>`;
                 } else {
-                    // 右端：目標の合計とランクを表示する場所
-                    s += `<td id="t-i9" style="font-weight:bold; color:#2c7a7b;"><div>0</div><div>E</div></td>`;
+                    // 右端：目標の「合計点数」のみを表示
+                    s += `<td id="t-total-cell" style="font-weight:bold; color:#2c7a7b; font-size:1.2em;">0</td>`;
                 }
             } else if (r === "目標得点") {
-                // --- ★目標に対する得点表示 ---
+                // ★目標得点の行
                 if (j < 9) {
                     s += `<td id="ts-i${j}">-</td>`;
                 } else {
-                    s += `<td>-</td>`;
+                    // 右端：目標の「ランク（評価）」のみを表示
+                    s += `<td id="t-rank-cell" style="font-weight:bold; color:#2f855a; font-size:1.2em;">E</td>`;
                 }
             } else {
-                // --- 平均値データ（既存通り） ---
+                // 統計データ（既存通り）
                 let v = A[g][r][j];
                 let displayVal = (j === 4) ? formatTime(v) : v;
                 if (j === 9) { 
@@ -172,11 +172,9 @@ function RT() {
         s += '</tr>';
     });
     s += '</table>';
-    document.getElementById("table").style.position = "relative";
     document.getElementById("table").innerHTML = '<div id="table-timestamp"></div>' + s;
 
-    // 表を作った直後に保存されている目標を読み込む
-    LT();
+    LT(); // 保存された目標の読み込み
 }
 
 function RS() {

@@ -105,6 +105,7 @@ function RT() {
     const g = document.getElementById("gender").value;
     if (!D[g]) return;
     const h = D[g].h;
+    
     const formatTime = (sec) => {
         const m = Math.floor(sec / 60);
         const s = Math.round(sec % 60);
@@ -115,29 +116,26 @@ function RT() {
     h.forEach(x => s += `<th>${x}</th>`);
     s += '</tr>';
 
-    // ★重要：ここに行の並び順を定義します
-    const rowNames = ["記録", "目標", "目標得点", "帯広市", "北海道", "全国"];
+    // 行の構成（目標と目標得点を追加）
+    const rows = ["記録", "目標", "目標得点", "帯広市", "北海道", "全国"];
 
-    rowNames.forEach(r => {
+    rows.forEach(r => {
         let label = r;
         let trStyle = "";
         if (r === "目標") trStyle = 'style="background:#e6fffa;"';
         if (r === "目標得点") trStyle = 'style="background:#f0fff4; font-size:0.8em; color:#2f855a;"';
         
         if (r === "北海道" || r === "全国") {
-            label = `<div>${r}</div><div style="font-size:0.8em; color:#666;">(R7)</div>`;
+            label = `<div>${r}</div><div style="font-size:0.8em; color:#666; font-weight:normal;">(R7)</div>`;
         }
 
         s += `<tr ${trStyle}><td>${label}</td>`;
 
         h.forEach((x, j) => {
             if (r === "記録") {
-                // --- 自分の記録（既存のコード） ---
+                // --- 自分の記録入力（既存通り） ---
                 if (j === 4) { 
-                    s += `<td><div style="display:flex;justify-content:center;gap:2px;">
-                          <input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:
-                          <input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;">
-                          </div><input type="hidden" id="i4"></td>`;
+                    s += `<td style="padding:2px;"><div style="display:flex;justify-content:center;gap:2px;"><input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:<input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;"></div><input type="hidden" id="i4"></td>`;
                 } else if (j < 9) {
                     s += `<td><input type="number" id="i${j}" class="v-in" onchange="U()" step="0.1" style="width:100%;"></td>`;
                 } else {
@@ -146,9 +144,10 @@ function RT() {
             } else if (r === "目標") {
                 // --- ★目標入力欄 ---
                 if (j < 9) {
-                    s += `<td><input type="number" id="t-i${j}" class="t-in" oninput="UT()" step="0.1" style="width:100%; border:1px solid #38b2ac; border-radius:4px;"></td>`;
+                    s += `<td><input type="number" id="t-i${j}" class="t-in" oninput="UT()" step="0.1" style="width:100%; border:1px solid #38b2ac; border-radius:4px; text-align:center;"></td>`;
                 } else {
-                    s += `<td>-</td>`; // 合計列は入力不要
+                    // 右端：目標の合計とランクを表示する場所
+                    s += `<td id="t-i9" style="font-weight:bold; color:#2c7a7b;"><div>0</div><div>E</div></td>`;
                 }
             } else if (r === "目標得点") {
                 // --- ★目標に対する得点表示 ---
@@ -158,23 +157,26 @@ function RT() {
                     s += `<td>-</td>`;
                 }
             } else {
-                // --- 統計データ（既存のコード） ---
+                // --- 平均値データ（既存通り） ---
                 let v = A[g][r][j];
                 let displayVal = (j === 4) ? formatTime(v) : v;
-                if (j === 9) {
-                    let totalScore = T[g][r];
-                    let totalRank = TR[g][r];
-                    s += `<td><div>${totalScore}</div><div style="font-size:0.8em;color:#666">(${totalRank})</div></td>`;
-                } else {
+                if (j === 9) { 
+                    let totalScore = T[g][r]; let totalRank = TR[g][r];
+                    s += `<td><div>${totalScore}</div><div style="font-size:0.8em;color:#666">(${totalRank})</div></td>`; 
+                } else { 
                     const sc = CS(v, x, g);
-                    s += `<td><div>${displayVal}</div><div style="font-size:0.8em;color:#666">(${sc}点)</div></td>`;
+                    s += `<td><div>${displayVal}</div><div style="font-size:0.8em;color:#666">(${sc}点)</div></td>`; 
                 }
             }
         });
         s += '</tr>';
     });
     s += '</table>';
+    document.getElementById("table").style.position = "relative";
     document.getElementById("table").innerHTML = '<div id="table-timestamp"></div>' + s;
+
+    // 表を作った直後に保存されている目標を読み込む
+    LT();
 }
 
 function RS() {

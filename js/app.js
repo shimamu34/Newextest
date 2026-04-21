@@ -364,19 +364,24 @@ function updateTimestamp() {
 }
 
 function sendToTeacher() {
+    // 1. 本人登録情報の取得
     const name = localStorage.getItem('studentName');
     const studentId = localStorage.getItem('studentId');
     const gasUrl = localStorage.getItem('gasUrl') || localStorage.getItem('teacherScriptUrl');
 
     if (!name || !studentId) {
-        alert("先に「本人登録」をしてください。");
-        openStudentConfig();
+        alert("先に「本人登録」を完了させてください。");
+        if (typeof openStudentConfig === 'function') openStudentConfig();
         return;
     }
-    if (!gasUrl) { alert("送信先URLが設定されていません。"); return; }
+    if (!gasUrl) {
+        alert("送信先URLが設定されていません。初回設定から保存してください。");
+        return;
+    }
 
     if (typeof N === 'function') N('送信中...', 'info');
 
+    // 2. 持久走データの整形
     let enduranceVal = document.getElementById('i4').value || "";
     if (enduranceVal !== "") {
         const totalSec = parseInt(enduranceVal);
@@ -385,7 +390,7 @@ function sendToTeacher() {
         enduranceVal = `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    // 送信データの作成
+    // 3. 送信データの作成（合計点・評価を追加）
     const payload = {
         name: name,
         studentId: studentId,
@@ -402,19 +407,25 @@ function sendToTeacher() {
         sprint50: document.getElementById('i6').value || "",
         jump: document.getElementById('i7').value || "",
         throw: document.getElementById('i8').value || "",
-        // ↓ここを追加（画面上の合計点と評価を取得）
-        total: document.getElementById('total').innerText,
-        rank: document.getElementById('rank').innerText
+        total: document.getElementById('total').innerText, // 合計点
+        rank: document.getElementById('rank').innerText    // A～E評価
     };
 
     const params = new URLSearchParams(payload);
-    fetch(`${gasUrl}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
+
+    // 4. GET通信で送信
+    fetch(`${gasUrl}?${params.toString()}`, {
+        method: 'GET',
+        mode: 'no-cors'
+    })
     .then(() => {
-        if (typeof N === 'function') N('送信完了！', 'success');
-        alert(`${name}さんのデータを送信しました。`);
+        if (typeof N === 'function') N('送信完了しました！', 'success');
+        alert(`${name}さんのデータを送信しました。\n合計点：${payload.total} 点（評価：${payload.rank}）`);
     })
     .catch(err => {
-        alert('エラーが発生しました。');
+        console.error("Fetch error:", err);
+        if (typeof N === 'function') N('送信失敗', 'error');
+        alert('送信に失敗しました。ネット接続や設定URLを確認してください。');
     });
 }
 

@@ -234,12 +234,16 @@ function doGet(e) {
     var s = data.session || "?";
     var sheetName = g + "年-" + c + "組-" + s + "回目";
     var sheet = ss.getSheetByName(sheetName) || ss.insertSheet(sheetName);
+
+    // 1. 見出しの修正（「合計点」と「評価」を追加）
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['出席番号', '氏名', '性別', '学年', '組', '回', '握力', '上体', '長座', '反復', '持久', 'シャトル', '50m', '立ち幅', '投', '日時']);
+      sheet.appendRow(['出席番号', '氏名', '性別', '学年', '組', '回', '握力', '上体', '長座', '反復', '持久', 'シャトル', '50m', '立ち幅', '投', '合計点', '評価', '日時']);
     }
+
     var sId = data.studentId ? String(data.studentId).replace(/[０-９]/g, function(s) {
       return String.fromCharCode(s.charCodeAt(0) - 65248);
     }).trim() : "0";
+
     var rows = sheet.getDataRange().getValues();
     var rowIndex = -1;
     for (var i = 1; i < rows.length; i++) {
@@ -248,10 +252,30 @@ function doGet(e) {
         break;
       }
     }
-    var rowData = [sId, data.name || "", (data.gender === '男' || data.gender === '男子') ? '男子' : '女子', g, c, s, data.grip || "", data.situp || "", data.forward || "", data.sidestep || "", data.endurance || "", data.shuttle || "", data.sprint50 || "", data.jump || "", data.throw || "", new Date()];
-    if (rowIndex > 0) { sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]); }
-    else { sheet.appendRow(rowData); }
-    if (sheet.getLastRow() >= 2) { sheet.getRange(2, 11, sheet.getLastRow() - 1).setNumberFormat("[m]:ss"); }
+
+    // 2. 書き込むデータの並び順を変更（data.total と data.rank を挿入）
+    var rowData = [
+      sId, 
+      data.name || "", 
+      (data.gender === '男' || data.gender === '男子') ? '男子' : '女子', 
+      g, c, s, 
+      data.grip || "", data.situp || "", data.forward || "", data.sidestep || "",
+      data.endurance || "", data.shuttle || "", data.sprint50 || "", data.jump || "", 
+      data.throw || "", 
+      data.total || "", // 合計点
+      data.rank || "",  // 評価
+      new Date()        // 日時（一番右に移動）
+    ];
+
+    if (rowIndex > 0) {
+      sheet.getRange(rowIndex, 1, 1, rowData.length).setValues([rowData]);
+    } else {
+      sheet.appendRow(rowData);
+    }
+
+    if (sheet.getLastRow() >= 2) {
+      sheet.getRange(2, 11, sheet.getLastRow() - 1).setNumberFormat("[m]:ss");
+    }
     return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
   } catch (f) {
     return ContentService.createTextOutput("Error: " + f.toString()).setMimeType(ContentService.MimeType.TEXT);

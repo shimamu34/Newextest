@@ -134,16 +134,15 @@ function RT() {
             if (r === "記録") {
                 // --- 自分の記録行 ---
                 if (j === 0) { // 握力の左右入力
-                    s += `<td style="padding:2px; min-width:100px;">
-                            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
-                                <div style="display:flex; gap:2px;">
-                                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:42px; font-size:11px; padding:2px; text-align:center;">
-                                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:42px; font-size:11px; padding:2px; text-align:center;">
-                                </div>
-                                <div id="i0_avg_disp" style="font-size:10px; color:#2b6cb0; font-weight:bold; line-height:1;">平均:-</div>
-                                <input type="hidden" id="i0" class="v-in">
-                            </div>
-                          </td>`;
+    　　　　　　　　s += `<td style="padding:4px; min-width:130px;"> <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div style="display:flex; gap:4px;">
+                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:55px; font-size:14px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:55px; font-size:14px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                </div>
+                <div id="i0_avg_disp" style="font-size:12px; color:#2b6cb0; font-weight:bold;">平均: -</div>
+                <input type="hidden" id="i0" class="v-in">
+            </div>
+          </td>`;
                 } else if (j === 4) { 
                     s += `<td><div style="display:flex;justify-content:center;gap:2px;"><input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:<input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;"></div><input type="hidden" id="i4"></td>`;
                 } else if (j < 9) {

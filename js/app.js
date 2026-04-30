@@ -134,13 +134,13 @@ function RT() {
             if (r === "記録") {
                 // --- 自分の記録行 ---
                 if (j === 0) { // 握力の左右入力
-    s += `<td style="padding:4px; min-width:140px;">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+    s += `<td style="padding:4px; min-width:130px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
                 <div style="display:flex; gap:4px;">
-                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:55px; font-size:14px; padding:6px; text-align:center; border-radius:6px; border:1px solid #ccc;">
-                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:55px; font-size:14px; padding:6px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:52px; font-size:13px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:52px; font-size:13px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
                 </div>
-                <div id="i0_avg_disp" style="font-size:20px; color:#1a365d; background:#ebf8ff; padding:4px 12px; border-radius:8px; border:1px solid #bee3f8; font-weight:bold; min-width:100px; text-align:center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <div id="i0_avg_disp" style="font-size:15px; color:#1a365d; background:#ebf8ff; padding:2px 10px; border-radius:6px; border:1px solid #bee3f8; font-weight:bold; min-width:90px; text-align:center;">
                     平均値:-
                 </div>
                 <input type="hidden" id="i0" class="v-in">
@@ -221,21 +221,20 @@ function U(isInitial = false) {
 
     if (rVal > 0 || lVal > 0) {
         const avg = (rVal > 0 && lVal > 0) ? (rVal + lVal) / 2 : (rVal + lVal);
-        
-        // 四捨五入して整数にする
-        const rounded = Math.round(avg); 
+        const rounded = Math.round(avg); // 四捨五入
         
         if (i0Hidden) i0Hidden.value = rounded;
         if (i0Disp) {
-            // kgを削除し、数値のみを表示
             i0Disp.textContent = "平均値: " + rounded;
             i0Disp.style.color = "#2b6cb0";
+            i0Disp.style.background = "#ebf8ff"; // 入力時は青背景
         }
     } else {
         if (i0Hidden) i0Hidden.value = "";
         if (i0Disp) {
             i0Disp.textContent = "平均値:-";
             i0Disp.style.color = "#a0aec0";
+            i0Disp.style.background = "#f7fafc"; // 未入力時は薄いグレー背景
         }
     }
     

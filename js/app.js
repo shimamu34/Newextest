@@ -132,8 +132,19 @@ function RT() {
 
         h.forEach((x, j) => {
             if (r === "記録") {
-                // 自分の記録（既存通り）
-                if (j === 4) { 
+                // --- 自分の記録行 ---
+                if (j === 0) { // 握力の左右入力
+                    s += `<td style="padding:2px; min-width:100px;">
+                            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                                <div style="display:flex; gap:2px;">
+                                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:42px; font-size:11px; padding:2px; text-align:center;">
+                                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:42px; font-size:11px; padding:2px; text-align:center;">
+                                </div>
+                                <div id="i0_avg_disp" style="font-size:10px; color:#2b6cb0; font-weight:bold; line-height:1;">平均:-</div>
+                                <input type="hidden" id="i0" class="v-in">
+                            </div>
+                          </td>`;
+                } else if (j === 4) { 
                     s += `<td><div style="display:flex;justify-content:center;gap:2px;"><input type="number" id="i4_min" class="v-in" onchange="U()" placeholder="分" style="width:38px;">:<input type="number" id="i4_sec" class="v-in" onchange="U()" placeholder="秒" style="width:38px;"></div><input type="hidden" id="i4"></td>`;
                 } else if (j < 9) {
                     s += `<td><input type="number" id="i${j}" class="v-in" onchange="U()" step="0.1" style="width:100%;"></td>`;
@@ -141,23 +152,21 @@ function RT() {
                     s += `<td id="i9"><div>0</div><div>E</div></td>`;
                 }
             } else if (r === "目標") {
-                // ★目標数値の行
+                // --- 目標行 ---
                 if (j < 9) {
                     s += `<td><input type="number" id="t-i${j}" class="t-in" oninput="UT()" step="0.1" style="width:100%; border:1px solid #38b2ac; border-radius:4px; text-align:center;"></td>`;
                 } else {
-                    // 右端：目標の「合計点数」のみを表示
                     s += `<td id="t-total-cell" style="font-weight:bold; color:#2c7a7b; font-size:1.2em;">0</td>`;
                 }
             } else if (r === "目標得点") {
-                // ★目標得点の行
+                // --- 目標得点行 ---
                 if (j < 9) {
                     s += `<td id="ts-i${j}">-</td>`;
                 } else {
-                    // 右端：目標の「ランク（評価）」のみを表示
                     s += `<td id="t-rank-cell" style="font-weight:bold; color:#2f855a; font-size:1.2em;">E</td>`;
                 }
             } else {
-                // 統計データ（既存通り）
+                // --- 統計データ（帯広・道・全国） ---
                 let v = A[g][r][j];
                 let displayVal = (j === 4) ? formatTime(v) : v;
                 if (j === 9) { 
@@ -176,7 +185,6 @@ function RT() {
 
     LT(); // 保存された目標の読み込み
 }
-
 function RS() {
     const g = document.getElementById("gender").value;
     const c = D[g].c; const h = D[g].h;
@@ -203,6 +211,23 @@ function RE() {
 // 6. 更新処理（U関数）
 // ==========================================
 function U(isInitial = false) {
+// --- 【追加】握力の左右平均計算 ---
+    const rVal = parseFloat(document.getElementById("i0_r")?.value) || 0;
+    const lVal = parseFloat(document.getElementById("i0_l")?.value) || 0;
+    const i0Hidden = document.getElementById("i0");
+    const i0Disp = document.getElementById("i0_avg_disp");
+
+    if (rVal > 0 || lVal > 0) {
+        // 両方あれば平均、片方ならその値を採用
+        const avg = (rVal > 0 && lVal > 0) ? (rVal + lVal) / 2 : (rVal + lVal);
+        const rounded = Math.floor(avg * 10) / 10; // 小数第2位以下切り捨て
+        if (i0Hidden) i0Hidden.value = rounded;
+        if (i0Disp) i0Disp.textContent = "平均:" + rounded;
+    } else {
+        if (i0Hidden) i0Hidden.value = "";
+        if (i0Disp) i0Disp.textContent = "平均:-";
+    }
+    
     const m = parseInt(document.getElementById("i4_min")?.value) || 0;
     const sec = parseInt(document.getElementById("i4_sec")?.value) || 0;
     const i4 = document.getElementById("i4");
@@ -413,6 +438,11 @@ function L() {
 
     // 入力欄を一度すべてリセット
     document.querySelectorAll(".v-in").forEach(input => { input.value = ""; });
+
+    if (document.getElementById("i0_r")) document.getElementById("i0_r").value = "";
+    if (document.getElementById("i0_l")) document.getElementById("i0_l").value = "";
+    if (document.getElementById("i0_avg_disp")) document.getElementById("i0_avg_disp").textContent = "平均:-";
+    
     if (document.getElementById("i4")) document.getElementById("i4").value = "";
     if (document.getElementById("i4_min")) document.getElementById("i4_min").value = "";
     if (document.getElementById("i4_sec")) document.getElementById("i4_sec").value = "";

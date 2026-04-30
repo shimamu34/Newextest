@@ -40,10 +40,9 @@ h2 span {
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    /* paddingを 12px → 6px 12px に変更（上下を半分に） */
     padding: 6px 12px; 
     margin: 2px auto;
-    max-width: 1200px;
+    max-width: 1350px; /* ここを1200から拡大 */
 }
 
 /* --- テーブルの基本設定 --- */
@@ -288,9 +287,9 @@ input[type="number"] {
 /* PC・横画面用：レイアウト調整（カッコのミスを修正済み） */
 @media screen and (min-width: 641px) {
     .card {
-        margin: 4px auto !important;
-        width: 95%;
-        padding: 10px 30px !important;
+        margin: 8px auto !important;
+        width: 98%; /* 95%から少し拡大 */
+        padding: 15px 40px !important; /* 左右の余白を少し増やす */
     }
     .tracking-top-bar {
         display: grid !important;

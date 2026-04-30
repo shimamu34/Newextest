@@ -211,7 +211,7 @@ function RE() {
 // 6. 更新処理（U関数）
 // ==========================================
 function U(isInitial = false) {
-// --- 【追加】握力の左右平均計算 ---
+// --- 握力の左右平均計算 ---
     const rVal = parseFloat(document.getElementById("i0_r")?.value) || 0;
     const lVal = parseFloat(document.getElementById("i0_l")?.value) || 0;
     const i0Hidden = document.getElementById("i0");
@@ -220,7 +220,10 @@ function U(isInitial = false) {
     if (rVal > 0 || lVal > 0) {
         // 両方あれば平均、片方ならその値を採用
         const avg = (rVal > 0 && lVal > 0) ? (rVal + lVal) / 2 : (rVal + lVal);
-        const rounded = Math.floor(avg * 10) / 10; // 小数第2位以下切り捨て
+        
+        // ★修正：Math.round を使って小数点第一位を四捨五入（整数にする）
+        const rounded = Math.round(avg); 
+        
         if (i0Hidden) i0Hidden.value = rounded;
         if (i0Disp) i0Disp.textContent = "平均値:" + rounded;
     } else {

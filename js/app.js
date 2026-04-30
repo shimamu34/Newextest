@@ -134,13 +134,15 @@ function RT() {
             if (r === "記録") {
                 // --- 自分の記録行 ---
                 if (j === 0) { // 握力の左右入力
-    　　　　　　s += `<td style="padding:4px; min-width:130px;">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    s += `<td style="padding:4px; min-width:140px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
                 <div style="display:flex; gap:4px;">
-                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:55px; font-size:14px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
-                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:55px; font-size:14px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:55px; font-size:14px; padding:6px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:55px; font-size:14px; padding:6px; text-align:center; border-radius:6px; border:1px solid #ccc;">
                 </div>
-                <div id="i0_avg_disp" style="font-size:14px; color:#2b6cb0; font-weight:bold; margin-top:2px;">平均値:-</div>
+                <div id="i0_avg_disp" style="font-size:20px; color:#1a365d; background:#ebf8ff; padding:4px 12px; border-radius:8px; border:1px solid #bee3f8; font-weight:bold; min-width:100px; text-align:center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    平均値:-
+                </div>
                 <input type="hidden" id="i0" class="v-in">
             </div>
           </td>`;
@@ -211,24 +213,30 @@ function RE() {
 // 6. 更新処理（U関数）
 // ==========================================
 function U(isInitial = false) {
-// --- 握力の左右平均計算 ---
+// --- 握力の左右平均計算（四捨五入） ---
     const rVal = parseFloat(document.getElementById("i0_r")?.value) || 0;
     const lVal = parseFloat(document.getElementById("i0_l")?.value) || 0;
     const i0Hidden = document.getElementById("i0");
     const i0Disp = document.getElementById("i0_avg_disp");
 
     if (rVal > 0 || lVal > 0) {
-        // 両方あれば平均、片方ならその値を採用
         const avg = (rVal > 0 && lVal > 0) ? (rVal + lVal) / 2 : (rVal + lVal);
         
-        // ★修正：Math.round を使って小数点第一位を四捨五入（整数にする）
+        // 四捨五入して整数にする
         const rounded = Math.round(avg); 
         
         if (i0Hidden) i0Hidden.value = rounded;
-        if (i0Disp) i0Disp.textContent = "平均値:" + rounded;
+        if (i0Disp) {
+            // kgを削除し、数値のみを表示
+            i0Disp.textContent = "平均値: " + rounded;
+            i0Disp.style.color = "#2b6cb0";
+        }
     } else {
         if (i0Hidden) i0Hidden.value = "";
-        if (i0Disp) i0Disp.textContent = "平均値:-";
+        if (i0Disp) {
+            i0Disp.textContent = "平均値:-";
+            i0Disp.style.color = "#a0aec0";
+        }
     }
     
     const m = parseInt(document.getElementById("i4_min")?.value) || 0;
@@ -444,7 +452,10 @@ function L() {
 
     if (document.getElementById("i0_r")) document.getElementById("i0_r").value = "";
     if (document.getElementById("i0_l")) document.getElementById("i0_l").value = "";
-    if (document.getElementById("i0_avg_disp")) document.getElementById("i0_avg_disp").textContent = "平均値:-";
+    if (document.getElementById("i0_avg_disp")) {
+        document.getElementById("i0_avg_disp").textContent = "平均値:-";
+        document.getElementById("i0_avg_disp").style.color = "#a0aec0";
+    }
     
     if (document.getElementById("i4")) document.getElementById("i4").value = "";
     if (document.getElementById("i4_min")) document.getElementById("i4_min").value = "";

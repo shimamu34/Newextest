@@ -1121,3 +1121,32 @@ async function takeScreenshot() {
         btn.disabled = false;
     }
 }
+
+// ★追加：握力の右左の値を個別に保存する関数
+function SIG() {
+    const g = document.getElementById("gender").value;
+    const gr = document.getElementById("grade").value;
+    const key = "grip-rl-" + g;
+    
+    const rVal = document.getElementById("i0_r")?.value || "";
+    const lVal = document.getElementById("i0_l")?.value || "";
+
+    let allData = JSON.parse(localStorage.getItem(key) || "{}");
+    allData[gr] = { r: rVal, l: lVal };
+    localStorage.setItem(key, JSON.stringify(allData));
+}
+
+// ★追加：握力の右左の値を読み込んで復元する関数
+function LG() {
+    const g = document.getElementById("gender").value;
+    const gr = document.getElementById("grade").value;
+    const key = "grip-rl-" + g;
+    
+    const allData = JSON.parse(localStorage.getItem(key) || "{}");
+    const data = allData[gr];
+
+    if (data) {
+        if (document.getElementById("i0_r")) document.getElementById("i0_r").value = data.r || "";
+        if (document.getElementById("i0_l")) document.getElementById("i0_l").value = data.l || "";
+    }
+}

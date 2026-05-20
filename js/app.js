@@ -309,6 +309,7 @@ function U(isInitial = false) {
     const activeEl = document.activeElement.id;
     if (activeEl !== "gender" && activeEl !== "grade") {
         SI();
+        SIG();
     }
 }
     //updateTimestamp();

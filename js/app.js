@@ -497,6 +497,7 @@ function L() {
         renderTimestampToArea(""); 
     }
 
+    LG();
     U(true);
 }
 

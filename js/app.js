@@ -213,7 +213,7 @@ function RE() {
 // 6. 更新処理（U関数）
 // ==========================================
 function U(isInitial = false) {
-// --- 握力の左右平均計算（四捨五入） ---
+    // --- 握力の左右平均計算（四捨五入＆保存データ保護） ---
     const rVal = parseFloat(document.getElementById("i0_r")?.value) || 0;
     const lVal = parseFloat(document.getElementById("i0_l")?.value) || 0;
     const i0Hidden = document.getElementById("i0");
@@ -227,14 +227,24 @@ function U(isInitial = false) {
         if (i0Disp) {
             i0Disp.textContent = "平均値: " + rounded;
             i0Disp.style.color = "#2b6cb0";
-            i0Disp.style.background = "#ebf8ff"; // 入力時は青背景
+            i0Disp.style.background = "#ebf8ff";
         }
     } else {
-        if (i0Hidden) i0Hidden.value = "";
-        if (i0Disp) {
-            i0Disp.textContent = "平均値:-";
-            i0Disp.style.color = "#a0aec0";
-            i0Disp.style.background = "#f7fafc"; // 未入力時は薄いグレー背景
+        // ★【ここを修正】初期読み込み時で、すでに過去の平均値データが残っている場合
+        if (isInitial && i0Hidden && i0Hidden.value !== "") {
+            if (i0Disp) {
+                i0Disp.textContent = "平均値: " + i0Hidden.value;
+                i0Disp.style.color = "#2b6cb0";
+                i0Disp.style.background = "#ebf8ff"; // 青いバッジ表示を復活させる
+            }
+        } else {
+            // 本当に何も入力されていない場合
+            if (i0Hidden) i0Hidden.value = "";
+            if (i0Disp) {
+                i0Disp.textContent = "平均値:-";
+                i0Disp.style.color = "#a0aec0";
+                i0Disp.style.background = "#f7fafc";
+            }
         }
     }
     

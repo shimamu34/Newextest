@@ -580,6 +580,9 @@ function sendToTeacher() {
 
     const params = new URLSearchParams(payload);
 
+    // ★原因特定のために、この1行を一時的に追加してください！
+    alert("【確認1】送信先URL:\n" + gasUrl + "\n\n【確認2】データ:\n" + params.toString());
+
     // 4. 通信実行
     fetch(`${gasUrl}?${params.toString()}`, {
         method: 'GET',

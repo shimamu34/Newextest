@@ -137,8 +137,8 @@ function RT() {
     s += `<td style="padding:4px; min-width:130px;">
             <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
                 <div style="display:flex; gap:4px;">
-                    <input type="number" id="i0_r" class="v-in" onchange="U()" placeholder="右" style="width:52px; font-size:13px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
-                    <input type="number" id="i0_l" class="v-in" onchange="U()" placeholder="左" style="width:52px; font-size:13px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_r" onchange="U()" placeholder="右" style="width:52px; font-size:13px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
+                    <input type="number" id="i0_l" onchange="U()" placeholder="左" style="width:52px; font-size:13px; padding:5px; text-align:center; border-radius:6px; border:1px solid #ccc;">
                 </div>
                 <div id="i0_avg_disp" style="font-size:15px; color:#1a365d; background:#ebf8ff; padding:2px 10px; border-radius:6px; border:1px solid #bee3f8; font-weight:bold; min-width:90px; text-align:center;">
                     平均値:-

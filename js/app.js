@@ -526,10 +526,10 @@ function sendToTeacher() {
         return;
     }
 
-    // 2. 送信先URLの取得（元々の正常に動いていた設定に100%戻しました）
-    const gasUrl = localStorage.getItem('gasUrl') || "";
+    // 2. 送信先URLの取得（★ここを完全修正：両方の保存キーを確実にチェックします）
+    const gasUrl = localStorage.getItem('teacherScriptUrl') || localStorage.getItem('gasUrl') || "";
     if (!gasUrl) {
-        alert("送信先URLが設定されていません。");
+        alert("送信先URLが設定されていません。管理画面から再設定するか、配布用URLからアクセスしてください。");
         return;
     }
 
@@ -550,18 +550,18 @@ function sendToTeacher() {
     if (scArea) {
         const divs = scArea.querySelectorAll("div");
         if (divs.length >= 2) {
-            totalVal = divs[0].innerText;
-            rankVal = divs[1].innerText;
+            totalVal = divs[0].innerText || "0";
+            rankVal = divs[1].innerText || "E";
         }
     }
 
-    // 5. 送信データの組み立て（元々のシンプルな構造に完全復旧）
+    // 5. 送信データの組み立て（ブラウザ互換性のため "class" を安全にクォーテーションで保護）
     const payload = {
         name: name,
         studentId: studentId,
         gender: document.getElementById('gender').value,
         grade: document.getElementById('grade').value,
-        class: document.getElementById('class').value,
+        "class": document.getElementById('class').value, 
         session: document.getElementById('session').value,
         grip: document.getElementById('i0').value || "0",
         situp: document.getElementById('i1').value || "0",
@@ -578,7 +578,7 @@ function sendToTeacher() {
 
     const params = new URLSearchParams(payload);
 
-    // ★【追加】通信開始の直前に「送信中」のポップアップ（トースト）を確実に表示
+    // ★ 通信開始の直前に「送信中...」のトースト通知を表示
     if (typeof N === 'function') {
         N('データを送信中...', 'info');
     }
@@ -589,6 +589,7 @@ function sendToTeacher() {
         mode: 'no-cors' // GAS送信に必須の設定
     })
     .then(() => {
+        // 送信が成功（または完了）したら緑色の通知に変え、アラートを出す
         if (typeof N === 'function') N('送信完了しました！', 'success');
         alert(`${name}さんのデータを送信しました。\n合計点：${payload.total} 点（評価：${payload.rank}）`);
     })
@@ -598,7 +599,6 @@ function sendToTeacher() {
         alert('送信に失敗しました。ネット接続を確認してください。');
     });
 }
-
 function RAnalysis(g) {
     const h = D[g].h.slice(0, 9);
     let myScores = [];

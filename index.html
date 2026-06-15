@@ -227,7 +227,12 @@
 
                 <textarea id="gsCodeSource" style="display:none;">
 function doGet(e) {
+  // ★同時アクセスの衝突を防ぐため、スクリプト全体のロックを取得
+  var lock = LockService.getScriptLock();
   try {
+    // 他の通信がある場合は最大30秒間、順番を待ちます
+    lock.waitLock(30000);
+
     var data = e.parameter;
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var g = data.grade || "?";
@@ -276,6 +281,9 @@ function doGet(e) {
     return ContentService.createTextOutput("Success").setMimeType(ContentService.MimeType.TEXT);
   } catch (f) {
     return ContentService.createTextOutput("Error: " + f.toString()).setMimeType(ContentService.MimeType.TEXT);
+  } finally {
+    // ★処理が終わったら、次の生徒のために確実にロックを解除
+    lock.releaseLock();
   }
 }
                             </textarea>

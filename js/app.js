@@ -522,18 +522,18 @@ function sendToTeacher() {
     const studentId = localStorage.getItem('studentId') || "";
     if (!name || !studentId) {
         alert("先に「本人登録」を行ってください。");
-        openStudentConfig();
+        if (typeof openStudentConfig === 'function') openStudentConfig();
         return;
     }
 
-    // 2. URLの取得
-    const gasUrl = localStorage.getItem('teacherScriptUrl') || localStorage.getItem('gasUrl') || "";
+    // 2. 送信先URLの取得（元々の正常に動いていた設定に100%戻しました）
+    const gasUrl = localStorage.getItem('gasUrl') || "";
     if (!gasUrl) {
-        alert("送信先URLが設定されていません。管理者に確認してください。");
+        alert("送信先URLが設定されていません。");
         return;
     }
 
-    // 3. 特殊な値（持久走、合計、評価）の安全な抽出
+    // 3. 持久走の値を組み立て
     let enduranceVal = "0";
     if (document.getElementById('i4_min') && document.getElementById('i4_sec')) {
         const mn = document.getElementById('i4_min').value;
@@ -543,45 +543,50 @@ function sendToTeacher() {
         }
     }
 
-    // 変数の初期化（エラー防止）
+    // 4. 合計点と評価の取得
     let totalVal = "0";
     let rankVal = "E";
     const scArea = document.getElementById("i9");
     if (scArea) {
         const divs = scArea.querySelectorAll("div");
         if (divs.length >= 2) {
-            totalVal = divs[0].innerText || "0";
-            rankVal = divs[1].innerText || "E";
+            totalVal = divs[0].innerText;
+            rankVal = divs[1].innerText;
         }
     }
 
-    // 4. 送信データの組み立て（予約語 class をしっかりと保護）
+    // 5. 送信データの組み立て（元々のシンプルな構造に完全復旧）
     const payload = {
         name: name,
         studentId: studentId,
         gender: document.getElementById('gender').value,
         grade: document.getElementById('grade').value,
-        "class": document.getElementById('class').value, // クォーテーションで囲んでエラー回避
+        class: document.getElementById('class').value,
         session: document.getElementById('session').value,
-        grip: document.getElementById('i0')?.value || "0",
-        situp: document.getElementById('i1')?.value || "0",
-        forward: document.getElementById('i2')?.value || "0",
-        sidestep: document.getElementById('i3')?.value || "0",
+        grip: document.getElementById('i0').value || "0",
+        situp: document.getElementById('i1').value || "0",
+        forward: document.getElementById('i2').value || "0",
+        sidestep: document.getElementById('i3').value || "0",
         endurance: enduranceVal,
-        shuttle: document.getElementById('i5')?.value || "0",
-        sprint50: document.getElementById('i6')?.value || "0",
-        jump: document.getElementById('i7')?.value || "0",
-        throw: document.getElementById('i8')?.value || "0",
+        shuttle: document.getElementById('i5').value || "0",
+        sprint50: document.getElementById('i6').value || "0",
+        jump: document.getElementById('i7').value || "0",
+        throw: document.getElementById('i8').value || "0",
         total: totalVal,
         rank: rankVal
     };
 
     const params = new URLSearchParams(payload);
 
-    // 5. 通信実行
+    // ★【追加】通信開始の直前に「送信中」のポップアップ（トースト）を確実に表示
+    if (typeof N === 'function') {
+        N('データを送信中...', 'info');
+    }
+
+    // 6. 通信実行
     fetch(`${gasUrl}?${params.toString()}`, {
         method: 'GET',
-        mode: 'no-cors'
+        mode: 'no-cors' // GAS送信に必須の設定
     })
     .then(() => {
         if (typeof N === 'function') N('送信完了しました！', 'success');
